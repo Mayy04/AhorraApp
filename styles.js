@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D9D9D9',
     padding: 10,
-    marginBottom: 20,
+    marginBottom: 10,
     width: '60%',
     backgroundColor: '#fff',
     borderRadius:10,
@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
   texto3: {
     color: '#BEFFE0',
     fontSize: 15,
-    marginBottom: 10,
+    marginBottom: 5,
     fontWeight: 'bold',
   },
   texto4: {
@@ -53,7 +53,8 @@ export const styles = StyleSheet.create({
     paddingVertical:10,
     paddingHorizontal:25,
     borderRadius:8,
-    marginBottom:20,
+    marginBottom:30,
+    marginTop:10,
     width: '60%',
   },
   botones2:{
@@ -63,6 +64,7 @@ export const styles = StyleSheet.create({
     borderRadius:8,
     marginBottom:20,
     width: '60%',
+    alignItems: 'center',
   },
   textoBoton:{
     color:'#fff',
