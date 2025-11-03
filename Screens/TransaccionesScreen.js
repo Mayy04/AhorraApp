@@ -21,7 +21,7 @@ export default function TransaccionesScreen() {
 
   return (
     <View style={styles.container}>
-      {/*Fondo verde grande detrás del contenido */}
+      {/*Fondo verde */}
       <ImageBackground
         source={require("../assets/fondo.png")}
         style={styles.headerBackground}
@@ -29,7 +29,7 @@ export default function TransaccionesScreen() {
       >
         <View style={styles.headerOverlay}>
           <Image
-            source={require("../assets/logoAhorra_2.jpg")}
+            source={require("../assets/logoAhorra_2.png")}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -37,9 +37,9 @@ export default function TransaccionesScreen() {
         </View>
       </ImageBackground>
 
-      {/* Contenido fijo */}
+      {/*Contenido fijo */}
       <View style={styles.content}>
-        {/* Filtros */}
+        {/*Filtros*/}
         <View style={styles.filterRow}>
           {["Todos", "Ingreso", "Egreso"].map((opcion) => (
             <TouchableOpacity
@@ -109,11 +109,11 @@ export default function TransaccionesScreen() {
         <Ionicons name="add" size={28} color="#fff" />
       </TouchableOpacity>
 
-      {/* 🧭 Navbar */}
+      {/*Navbar*/}
       <Image
         source={require("../assets/navbar.png")}
         style={styles.navbarImage}
-        resizeMode="contain"
+        resizeMode="cover"
       />
     </View>
   );
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   filterText: { color: "#333", fontWeight: "500" },
   filterTextActive: { color: "#fff", fontWeight: "600" },
 
-  // 🔹 Ordenar
+  // Ordenar
   orderRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -244,7 +244,7 @@ fab: {
     position: "absolute",
     bottom: 0,
 
-    width: "100%",
+    width: "cover",
     height: height * 0.1,
     zIndex: 2,
     
