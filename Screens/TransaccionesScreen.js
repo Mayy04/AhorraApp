@@ -134,11 +134,11 @@ const styles = StyleSheet.create({
   headerOverlay: {
     flex: 1,
     paddingTop: Platform.OS === "web" ? 20 : 60,
-    paddingLeft: Platform.OS === "web" ? 40 : 25,
+    paddingLeft: Platform.OS === "web" ? 40 : 20,
   },
   logo: {
-    width: Platform.OS === "web" ? 200 : width * 0.25,
-    height: Platform.OS === "web" ? 100 : height * 0.06,
+    width: Platform.OS === "web" ? 200 : width * 0.35,
+    height: Platform.OS === "web" ? 100 : height * 0.08,
     marginBottom: 5,
   },
   headerTitle: {
