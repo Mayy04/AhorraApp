@@ -133,17 +133,17 @@ const styles = StyleSheet.create({
   //Logo y titulo dentro del fondo verde
   headerOverlay: {
     flex: 1,
-    paddingTop: Platform.OS === "web" ? 30 : 60,
-    paddingLeft: 25,
+    paddingTop: Platform.OS === "web" ? 20 : 60,
+    paddingLeft: Platform.OS === "web" ? 40 : 25,
   },
   logo: {
-    width: width * 0.25,
-    height: height * 0.06,
+    width: Platform.OS === "web" ? 200 : width * 0.25,
+    height: Platform.OS === "web" ? 100 : height * 0.06,
     marginBottom: 5,
   },
   headerTitle: {
     color: "#fff",
-    fontSize: width > 600 ? 36 : 26,
+    fontSize: width > 600 ? 40 : 26,
     fontWeight: "bold",
   },
 
@@ -204,8 +204,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   dropdownText: { 
-    fontSize: 
-    14, 
+    fontSize: 14, 
     marginRight: 5 
   },
 
@@ -262,11 +261,8 @@ fab: {
   bottom: Platform.OS === "web" ? height * 0.09 : height * 0.12, //que tan arriba desde el borde inferior
   right: Platform.OS === "web" ? width * 0.08 : width * 0.06, //que tan alejado desde el borde derecho
   backgroundColor: "#FFD600",
-
-  // Tamaños ancho y alto del boton distintos según plataforma
-  width: Platform.OS === "web" ? 55 : width * 0.13,
+  width: Platform.OS === "web" ? 55 : width * 0.13,// Tamaños ancho y alto del boton distintos según plataforma
   height: Platform.OS === "web" ? 55 : width * 0.13,
-
   borderRadius: 50,
   justifyContent: "center",
   alignItems: "center",
@@ -277,7 +273,6 @@ fab: {
   navbarImage: {
     position: "absolute",
     bottom: 0,
-
     width: "100%",
     height: height * 0.15,
     zIndex: 2,
