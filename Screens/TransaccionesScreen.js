@@ -21,7 +21,7 @@ export default function TransaccionesScreen() {
 
   return (
     <View style={styles.container}>
-      {/*Fondo verde */}
+      {/*Fondo verde*/}
       <ImageBackground
         source={require("../assets/fondo.png")}
         style={styles.headerBackground}
@@ -37,9 +37,9 @@ export default function TransaccionesScreen() {
         </View>
       </ImageBackground>
 
-      {/*Contenido fijo */}
+      {/* Contenido fijo */}
       <View style={styles.content}>
-        {/*Filtros*/}
+        {/* Filtros */}
         <View style={styles.filterRow}>
           {["Todos", "Ingreso", "Egreso"].map((opcion) => (
             <TouchableOpacity
@@ -104,16 +104,16 @@ export default function TransaccionesScreen() {
         />
       </View>
 
-      {/* Botón flotante */}
+      {/*Botón flotante */}
       <TouchableOpacity style={styles.fab}>
         <Ionicons name="add" size={28} color="#fff" />
       </TouchableOpacity>
 
-      {/*Navbar*/}
+      {/*Navbar */}
       <Image
         source={require("../assets/navbar.png")}
         style={styles.navbarImage}
-        resizeMode="cover"
+        resizeMode="contain"
       />
     </View>
   );
@@ -137,9 +137,9 @@ const styles = StyleSheet.create({
     paddingLeft: 25,
   },
   logo: {
-    width: width * 0.10,
+    width: width * 0.25,
     height: height * 0.06,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   headerTitle: {
     color: "#fff",
@@ -169,9 +169,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     marginVertical: 4,
   },
-  filterActive: { backgroundColor: "#00A859" },
-  filterText: { color: "#333", fontWeight: "500" },
-  filterTextActive: { color: "#fff", fontWeight: "600" },
+  filterActive: { 
+    backgroundColor: "#00A859" 
+  },
+  filterText: 
+  { color: "#333", 
+    fontWeight: "500"     
+  },
+  filterTextActive: { 
+    color: "#fff", 
+    fontWeight: "600"
+  },
 
   // Ordenar
   orderRow: {
@@ -181,7 +189,11 @@ const styles = StyleSheet.create({
     marginHorizontal: width * 0.06,
     marginTop: 15,
   },
-  orderLabel: { color: "#333", marginRight: 10, fontSize: 14 },
+  orderLabel: { 
+    color: "#333", 
+    marginRight: 10, 
+    fontSize: 14 
+},
   dropdown: {
     flexDirection: "row",
     alignItems: "center",
@@ -191,7 +203,11 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 6,
   },
-  dropdownText: { fontSize: 14, marginRight: 5 },
+  dropdownText: { 
+    fontSize: 
+    14, 
+    marginRight: 5 
+  },
 
   // Tablas
   // Encabezado de la tabla
@@ -215,12 +231,30 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   // Texto de las filas de la tabla
-  monto: { fontSize: 14, fontWeight: "bold" },
-  ingreso: { color: "#00A859" },
-  egreso: { color: "#D62C1A" },
-  categoria: { fontSize: 14, color: "#333", fontWeight: "500" },
-  fecha: { fontSize: 13, color: "#555" },
-  iconos: { flexDirection: "row", width: 50, justifyContent: "flex-end" },
+  monto: { 
+    fontSize: 14,
+    fontWeight: "bold" 
+  },
+  ingreso: { 
+    color: "#00A859" 
+  },
+  egreso: { 
+    color: "#D62C1A" 
+  },
+  categoria: { 
+    fontSize: 14, 
+    color: "#333", 
+    fontWeight: "500" 
+  },
+  fecha: { 
+    fontSize: 13, 
+    color: "#555" 
+  },
+  iconos: { 
+    flexDirection: "row", 
+    width: 50, 
+    justifyContent: "flex-end" 
+  },
 
   // Botón flotante
 fab: {
@@ -244,8 +278,8 @@ fab: {
     position: "absolute",
     bottom: 0,
 
-    width: "cover",
-    height: height * 0.1,
+    width: "100%",
+    height: height * 0.15,
     zIndex: 2,
     
   },
