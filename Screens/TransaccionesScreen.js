@@ -4,7 +4,7 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
-export default function TransaccionesScreen() {
+export default function TransaccionesScreen({ setScreen }) {
   const [filtro, setFiltro] = useState("Todos");
 
   const transacciones = [
@@ -28,11 +28,16 @@ export default function TransaccionesScreen() {
         resizeMode="stretch"
       >
         <View style={styles.headerOverlay}>
-          <Image
-            source={require("../assets/logoAhorra_2.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <TouchableOpacity
+            onPress={() => (setScreen ? setScreen('menu') : null)}
+            activeOpacity={0.8}
+          >
+            <Image
+              source={require("../assets/logoAhorra_2.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
           <Text style={styles.headerTitle}>Transacciones</Text>
         </View>
       </ImageBackground>
@@ -276,6 +281,7 @@ fab: {
     width: "100%",
     height: height * 0.15,
     zIndex: 2,
+    marginBottom: Platform.OS === "web" ? -10 : 5,
     
   },
 });

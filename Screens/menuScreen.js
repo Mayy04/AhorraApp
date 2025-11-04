@@ -31,7 +31,7 @@ export default function MenuScreen(){
         case 'perfil':
             return <PerfilScreen/>;
         case 'transacciones':
-            return <TransaccionesScreen/>;
+            return <TransaccionesScreen setScreen={setScreen}/>;
         case 'menu':
             default:
                 return(
