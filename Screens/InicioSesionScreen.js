@@ -1,10 +1,11 @@
 import { Text, View, Dimensions, TouchableOpacity, TextInput, Image, Switch,
 } from 'react-native'
 import {styles} from '../styles';
-import React, { useState } from 'react'
+import { useState } from 'react'
 import PrincipalScreen from './PrincipalScreen'
 import RegistroScreen from './RegistroScreen'
 import RecuperarContraseñaScreen from './RecuperarContraseñaScreen'
+import MenuScreen from './menuScreen';
  
 
 export default function InicioSesionScreen() {
@@ -18,11 +19,15 @@ export default function InicioSesionScreen() {
     return <RecuperarContraseñaScreen/>
   case 'registro':
     return <RegistroScreen/>
+  case 'regresar':
+    return <MenuScreen/>
   case 'ingreso':
     default:
   return (
         <View style={styles.container}>
+        <TouchableOpacity onPress={()=>setScreen('regresar')}>
         <Image source={require('../assets/logoAhorra.png')} style={styles.logo}/>
+        </TouchableOpacity>
           <Text style={styles.texto}>AHORRA+</Text>
 
           <TextInput 
