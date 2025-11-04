@@ -13,13 +13,13 @@ export default function PerfilScreen() {
         {/* Encabezado */}
         <View style={styles.header}>
           <Image
-            source={require('../assets/logoAhorra_2.jpg')}
+            source={require('../assets/logoAhorra_2.png')}
             style={styles.logo}
           />
 
           <View style={styles.profileHeader}>
             <Image
-              source={require('../assets/icon.png')} // Imagen temporal o tuya
+              source={require('../assets/Perfil.png')} // Imagen temporal o tuya
               style={styles.avatar}
             />
             <Text style={styles.nombre}>Alvaro Ochoa</Text>
