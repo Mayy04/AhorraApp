@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, Platform, StyleSheet } from 'react-native';
+import MenuScreen from "./menuScreen";
 
 export default function RegistroScreen() {
   const [nombre, setNombre] = useState('');
@@ -7,6 +8,8 @@ export default function RegistroScreen() {
   const [telefono, setTelefono] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [confirmar, setConfirmar] = useState('');
+   const [screen, setScreen]=useState('inicio');
+  
 
   const mostrarAlerta = () => {
     if (
@@ -23,10 +26,18 @@ export default function RegistroScreen() {
       Alert.alert('Registro exitoso', `¡Bienvenido, ${nombre}!`);
     }
   };
+switch(screen){
+    case 'regresar':
+      return<MenuScreen/>
+    case 'inicio':
+      default:
 
   return (
     <View style={styles.container}>
-      <Text style={styles.texto}>Registrarse</Text>
+      <TouchableOpacity onPress={()=> setScreen('regresar')}>
+        <Text style={styles.texto}>Registrarse</Text>
+      </TouchableOpacity>
+      
 
       <Text style={styles.texto2}>Ingresa tu nombre</Text>
       <TextInput
@@ -77,6 +88,7 @@ export default function RegistroScreen() {
       </TouchableOpacity>
     </View>
   );
+}
 }
 
 const styles = StyleSheet.create({

@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+
 import {View, Text, TouchableOpacity, StyleSheet, FlatList, Image, ImageBackground, Dimensions, Platform,} from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-
+import { useState } from "react";
+import MenuScreen from "./menuScreen";
 const { width, height } = Dimensions.get("window");
 
-export default function TransaccionesScreen({ setScreen }) {
+export default function TransaccionesScreen() {
   const [filtro, setFiltro] = useState("Todos");
-
+  
   const transacciones = [
     { id: "1", tipo: "Ingreso", monto: "+$5000.00", categoria: "Sueldo", fecha: "07/09/25" },
     { id: "2", tipo: "Egreso", monto: "-$250.00", categoria: "Despensa", fecha: "05/09/25" },
@@ -18,6 +19,12 @@ export default function TransaccionesScreen({ setScreen }) {
 
   const filtradas =
     filtro === "Todos" ? transacciones : transacciones.filter((t) => t.tipo === filtro);
+   const [screen, setScreen]=useState('inicio');
+  switch(screen){
+    case 'regresar':
+      return<MenuScreen/>
+    case 'inicio':
+      default:
 
   return (
     <View style={styles.container}>
@@ -28,16 +35,14 @@ export default function TransaccionesScreen({ setScreen }) {
         resizeMode="stretch"
       >
         <View style={styles.headerOverlay}>
-          <TouchableOpacity
-            onPress={() => (setScreen ? setScreen('menu') : null)}
-            activeOpacity={0.8}
-          >
+          <TouchableOpacity onPress={()=> setScreen('regresar')}>
             <Image
-              source={require("../assets/logoAhorra_2.png")}
-              style={styles.logo}
-              resizeMode="contain"
-            />
+            source={require("../assets/logoAhorra_2.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
           </TouchableOpacity>
+          
           <Text style={styles.headerTitle}>Transacciones</Text>
         </View>
       </ImageBackground>
@@ -122,6 +127,7 @@ export default function TransaccionesScreen({ setScreen }) {
       />
     </View>
   );
+}
 }
 
 const styles = StyleSheet.create({
@@ -281,7 +287,6 @@ fab: {
     width: "100%",
     height: height * 0.15,
     zIndex: 2,
-    marginBottom: Platform.OS === "web" ? -10 : 5,
     
   },
 });
