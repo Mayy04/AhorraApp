@@ -25,12 +25,12 @@ export default function AnalisisScreen() {
       {/*Gráficos de análisis*/}  
       <View style={styles.graficoContainer}>
         <Image
-          source={require("../assets/WhatsApp Image 2025-10-28 at 10.08.30.jpeg")}
+          source={require("../assets/ingresos.png")}
           style={styles.grafico}
           resizeMode="contain"
         />
         <Image 
-          source={require("../assets/WhatsApp Image 2025-10-28 at 10.08.31.jpeg")}
+          source={require("../assets/egresos.png")}
           style={styles.grafico}
           resizeMode="contain"
         />
@@ -47,11 +47,9 @@ export default function AnalisisScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: "#fff" 
-},
+  container: { flex: 1, backgroundColor: "#fff" },
 
+ 
   headerBackground: {
     position: "absolute",
     top: 0,
@@ -59,7 +57,6 @@ const styles = StyleSheet.create({
     height: height * 0.60,
     zIndex: 0,
   },
-  
   headerOverlay: {
     flex: 1,
     flexDirection: "column",
@@ -67,7 +64,7 @@ const styles = StyleSheet.create({
     paddingLeft: Platform.OS === "web" ? 30 : 25,
     alignItems: "flex-start",
   },
-
+  
   logo: {
     width: Platform.OS === "web" ? width * 0.10 : width * 0.25,
     height: Platform.OS === "web" ? height * 0.10 : height * 0.06,
