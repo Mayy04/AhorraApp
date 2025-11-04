@@ -140,5 +140,6 @@ const styles = StyleSheet.create({
     width: width,
     height: 65,
     resizeMode: 'contain',
+    marginBottom: '5%',
   },
 });
