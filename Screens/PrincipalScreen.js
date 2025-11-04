@@ -11,7 +11,7 @@ export default function PrincipalScreen() {
         {/* Encabezado */}
         <View style={styles.header}>
           <Image
-            source={require('../assets/logoAhorra_2.jpg')}
+            source={require('../assets/logoAhorra_2.png')}
             style={styles.logo}
           />
           <Text style={styles.saludo}>Hola, Usuario</Text>
