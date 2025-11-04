@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, Platform, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, Platform, StyleSheet } from 'react-native';
 
 export default function RegistroScreen() {
-
   const [nombre, setNombre] = useState('');
   const [correo, setCorreo] = useState('');
   const [telefono, setTelefono] = useState('');
@@ -10,32 +9,26 @@ export default function RegistroScreen() {
   const [confirmar, setConfirmar] = useState('');
 
   const mostrarAlerta = () => {
-    if (nombre.trim() === '' || correo.trim() === '' || telefono.trim() === '' || contrasena.trim() === '' || confirmar.trim() === '') {
-      if (Platform.OS === 'web') {
-        window.alert('Error: Todos los campos son obligatorios');
-      } else {
-        Alert.alert('Error', 'Todos los campos son obligatorios');
-      }
+    if (
+      nombre.trim() === '' ||
+      correo.trim() === '' ||
+      telefono.trim() === '' ||
+      contrasena.trim() === '' ||
+      confirmar.trim() === ''
+    ) {
+      Alert.alert('Error', 'Todos los campos son obligatorios');
     } else if (contrasena !== confirmar) {
-      if (Platform.OS === 'web') {
-        window.alert('Error: Las contraseñas no coinciden');
-      } else {
-        Alert.alert('Error', 'Las contraseñas no coinciden');
-      }
+      Alert.alert('Error', 'Las contraseñas no coinciden');
     } else {
-      if (Platform.OS === 'web') {
-        window.alert(`Registro exitoso: ¡Bienvenido, ${nombre}!`);
-      } else {
-        Alert.alert('Registro exitoso', `¡Bienvenido, ${nombre}!`);
-      }
+      Alert.alert('Registro exitoso', `¡Bienvenido, ${nombre}!`);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Registrarse</Text>
+      <Text style={styles.texto}>Registrarse</Text>
 
-      <Text style={styles.label}>Ingresa tu nombre</Text>
+      <Text style={styles.texto2}>Ingresa tu nombre</Text>
       <TextInput
         style={styles.input}
         placeholder="Nombre"
@@ -43,7 +36,7 @@ export default function RegistroScreen() {
         onChangeText={setNombre}
       />
 
-      <Text style={styles.label}>Ingresa tu correo electrónico</Text>
+      <Text style={styles.texto2}>Ingresa tu correo electrónico</Text>
       <TextInput
         style={styles.input}
         placeholder="Correo electrónico"
@@ -52,7 +45,7 @@ export default function RegistroScreen() {
         keyboardType="email-address"
       />
 
-      <Text style={styles.label}>Ingresa tu número telefónico</Text>
+      <Text style={styles.texto2}>Ingresa tu número telefónico</Text>
       <TextInput
         style={styles.input}
         placeholder="Número telefónico"
@@ -61,7 +54,7 @@ export default function RegistroScreen() {
         keyboardType="phone-pad"
       />
 
-      <Text style={styles.label}>Crea una contraseña</Text>
+      <Text style={styles.texto2}>Crea una contraseña</Text>
       <TextInput
         style={styles.input}
         placeholder="Contraseña"
@@ -70,7 +63,7 @@ export default function RegistroScreen() {
         secureTextEntry={true}
       />
 
-      <Text style={styles.label}>Confirma tu contraseña</Text>
+      <Text style={styles.texto2}>Confirma tu contraseña</Text>
       <TextInput
         style={styles.input}
         placeholder="Confirmar contraseña"
@@ -79,7 +72,9 @@ export default function RegistroScreen() {
         secureTextEntry={true}
       />
 
-      <Button color="#00cc66" title="Registrarse" onPress={mostrarAlerta} />
+      <TouchableOpacity style={styles.botones} onPress={mostrarAlerta}>
+        <Text style={styles.textoBoton}>REGISTRARSE</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -87,28 +82,44 @@ export default function RegistroScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#009c5bff',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#53d398',
-    padding: 20,
-  },
-  titulo: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 25,
-  },
-  label: {
-    color: 'white',
-    alignSelf: 'flex-start',
-    marginLeft: '10%',
-    marginBottom: 5,
   },
   input: {
-    width: '80%',
-    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#D9D9D9',
     padding: 10,
+    marginBottom: 10,
+    width: '60%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+  },
+  texto: {
+    color: '#000000',
+    fontSize: 30,
+    marginBottom: 30,
+    fontWeight: 'bold',
+  },
+  texto2: {
+    color: '#000000',
+    fontSize: 20,
+    marginBottom: 10,
+    fontWeight: 'bold',
+  },
+  botones: {
+    backgroundColor: '#00D162',
+    paddingVertical: 10,
+    paddingHorizontal: 25,
     borderRadius: 8,
-    marginBottom: 15,
+    marginBottom: 30,
+    marginTop: 10,
+    width: '60%',
+  },
+  textoBoton: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

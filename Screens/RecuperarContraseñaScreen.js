@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 
 export default function OlvidarContrasena() {
   const [nombre, setNombre] = useState('');
@@ -15,9 +15,9 @@ export default function OlvidarContrasena() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>¿Olvidaste tu contraseña?</Text>
+      <Text style={styles.texto}>¿Olvidaste tu contraseña?</Text>
 
-      <Text style={styles.label}>Ingresa tu nombre</Text>
+      <Text style={styles.texto2}>Ingresa tu nombre</Text>
       <TextInput
         style={styles.input}
         placeholder="Nombre"
@@ -25,7 +25,7 @@ export default function OlvidarContrasena() {
         onChangeText={setNombre}
       />
 
-      <Text style={styles.label}>Ingresa tu correo electrónico</Text>
+      <Text style={styles.texto2}>Ingresa tu correo electrónico</Text>
       <TextInput
         style={styles.input}
         placeholder="Correo electrónico"
@@ -34,8 +34,8 @@ export default function OlvidarContrasena() {
         onChangeText={setCorreo}
       />
 
-      <TouchableOpacity style={styles.boton} onPress={enviar}>
-        <Text style={styles.textoBoton}>Enviar</Text>
+      <TouchableOpacity style={styles.botones} onPress={enviar}>
+        <Text style={styles.textoBoton}>ENVIAR</Text>
       </TouchableOpacity>
     </View>
   );
@@ -44,40 +44,44 @@ export default function OlvidarContrasena() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#009c5bff',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#4CC98A',
-    padding: 20,
-  },
-  titulo: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 40,
-    textAlign: 'center',
-  },
-  label: {
-    alignSelf: 'flex-start',
-    color: '#fff',
-    fontSize: 14,
-    marginBottom: 5,
   },
   input: {
-    width: '100%',
+    borderWidth: 1,
+    borderColor: '#D9D9D9',
+    padding: 10,
+    marginBottom: 10,
+    width: '60%',
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 10,
-    marginBottom: 20,
   },
-  boton: {
-    backgroundColor: '#00C853',
-    paddingVertical: 15,
-    paddingHorizontal: 80,
-    borderRadius: 10,
+  texto: {
+    color: '#000000',
+    fontSize: 30,
+    marginBottom: 30,
+    fontWeight: 'bold',
+  },
+  texto2: {
+    color: '#000000',
+    fontSize: 20,
+    marginBottom: 10,
+    fontWeight: 'bold',
+  },
+  botones: {
+    backgroundColor: '#00D162',
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+    marginBottom: 30,
+    marginTop: 10,
+    width: '60%',
   },
   textoBoton: {
     color: '#fff',
-    fontWeight: 'bold',
     fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
