@@ -1,24 +1,77 @@
 
-import {View, Text, TouchableOpacity, StyleSheet, FlatList, Image, ImageBackground, Dimensions, Platform,} from "react-native";
+import {View, Text, TouchableOpacity, StyleSheet, FlatList, Image, ImageBackground, Dimensions, Platform, TextInput, Alert,} from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MenuScreen from "./menuScreen";
 const { width, height } = Dimensions.get("window");
 
 export default function TransaccionesScreen() {
   const [filtro, setFiltro] = useState("Todos");
   
-  const transacciones = [
+  const [transacciones, setTransacciones] = useState([
     { id: "1", tipo: "Ingreso", monto: "+$5000.00", categoria: "Sueldo", fecha: "07/09/25" },
     { id: "2", tipo: "Egreso", monto: "-$250.00", categoria: "Despensa", fecha: "05/09/25" },
     { id: "3", tipo: "Egreso", monto: "-$100.00", categoria: "Transporte", fecha: "03/09/25" },
     { id: "4", tipo: "Ingreso", monto: "+$1000.00", categoria: "Bono", fecha: "01/09/25" },
     { id: "5", tipo: "Ingreso", monto: "+$750.00", categoria: "Venta", fecha: "25/08/25" },
     { id: "6", tipo: "Egreso", monto: "-$80.00", categoria: "Café", fecha: "22/08/25" },
-  ];
+  ]);
 
-  const filtradas =
-    filtro === "Todos" ? transacciones : transacciones.filter((t) => t.tipo === filtro);
+  const [filtradas, setFiltradas] = useState(transacciones);
+
+  useEffect(() => {
+    setFiltradas(filtro === "Todos" ? transacciones : transacciones.filter((t) => t.tipo === filtro));
+  }, [filtro, transacciones]);
+
+  // Formulario inline
+  const [formVisible, setFormVisible] = useState(false);
+  const [form, setForm] = useState({ id: null, tipo: "Ingreso", monto: "", categoria: "", fecha: "" });
+  const [isEditing, setIsEditing] = useState(false);
+  const [fabOptionsVisible, setFabOptionsVisible] = useState(false);
+
+  const genId = () => Date.now().toString();
+
+  const crearTransaccion = (nuevo) => {
+    if (!nuevo.monto || !nuevo.categoria || !nuevo.fecha) {
+      Alert.alert("Error", "Completa todos los campos");
+      return;
+    }
+    const item = { ...nuevo, id: genId() };
+    setTransacciones((prev) => [item, ...prev]);
+    setFormVisible(false);
+    setForm({ id: null, tipo: "Ingreso", monto: "", categoria: "", fecha: "" });
+  };
+
+  const actualizarTransaccion = (actualizado) => {
+    if (!actualizado.monto || !actualizado.categoria || !actualizado.fecha) {
+      Alert.alert("Error", "Completa todos los campos");
+      return;
+    }
+    setTransacciones((prev) => prev.map((t) => (t.id === actualizado.id ? actualizado : t)));
+    setFormVisible(false);
+    setIsEditing(false);
+    setForm({ id: null, tipo: "Ingreso", monto: "", categoria: "", fecha: "" });
+  };
+
+  const eliminarTransaccion = (id) => {
+    Alert.alert("Confirmar", "¿Eliminar esta transacción?", [
+      { text: "Cancelar", style: "cancel" },
+      { text: "Eliminar", style: "destructive", onPress: () => setTransacciones((prev) => prev.filter((t) => t.id !== id)) },
+    ]);
+  };
+
+  const abrirNuevo = (tipo = "Ingreso") => {
+    setForm({ id: null, tipo: tipo, monto: "", categoria: "", fecha: "" });
+    setIsEditing(false);
+    setFormVisible(true);
+    setFabOptionsVisible(false);
+  };
+
+  const abrirEditar = (item) => {
+    setForm(item);
+    setIsEditing(true);
+    setFormVisible(true);
+  };
    const [screen, setScreen]=useState('inicio');
   switch(screen){
     case 'regresar':
@@ -89,6 +142,31 @@ export default function TransaccionesScreen() {
           <Text style={[styles.tableHeaderText, { width: 50 }]}></Text>
         </View>
 
+        {/* Formulario inline */}
+        {formVisible && (
+          <View style={styles.formInline}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <TouchableOpacity style={[styles.tipoButton, form.tipo === 'Ingreso' && styles.tipoActive]} onPress={() => setForm((s) => ({ ...s, tipo: 'Ingreso' }))}>
+                <Text style={form.tipo === 'Ingreso' ? styles.tipoTextActive : styles.tipoText}>Ingreso</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.tipoButton, form.tipo === 'Egreso' && styles.tipoActive]} onPress={() => setForm((s) => ({ ...s, tipo: 'Egreso' }))}>
+                <Text style={form.tipo === 'Egreso' ? styles.tipoTextActive : styles.tipoText}>Egreso</Text>
+              </TouchableOpacity>
+            </View>
+            <TextInput placeholder="Monto (p.ej. +$100.00)" value={form.monto} onChangeText={(t) => setForm((s) => ({ ...s, monto: t }))} style={styles.input} />
+            <TextInput placeholder="Categoría" value={form.categoria} onChangeText={(t) => setForm((s) => ({ ...s, categoria: t }))} style={styles.input} />
+            <TextInput placeholder="Fecha (DD/MM/AA)" value={form.fecha} onChangeText={(t) => setForm((s) => ({ ...s, fecha: t }))} style={styles.input} />
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 }}>
+              <TouchableOpacity style={styles.formButton} onPress={() => { setFormVisible(false); setIsEditing(false); setForm({ id: null, tipo: 'Ingreso', monto: '', categoria: '', fecha: '' }); }}>
+                <Text>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.formButton, { marginLeft: 10 }]} onPress={() => { isEditing ? actualizarTransaccion(form) : crearTransaccion(form); }}>
+                <Text style={{ fontWeight: '600' }}>{isEditing ? 'Guardar' : 'Crear'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
         {/* Lista */}
         <FlatList
           data={filtradas}
@@ -106,8 +184,12 @@ export default function TransaccionesScreen() {
               <Text style={[styles.categoria, { flex: 1 }]}>{item.categoria}</Text>
               <Text style={[styles.fecha, { flex: 1 }]}>{item.fecha}</Text>
               <View style={styles.iconos}>
-                <MaterialIcons name="edit" size={18} color="#555" style={{ marginRight: 8 }} />
-                <MaterialIcons name="delete-outline" size={18} color="#555" />
+                <TouchableOpacity onPress={() => abrirEditar(item)}>
+                  <MaterialIcons name="edit" size={18} color="#555" style={{ marginRight: 8 }} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => eliminarTransaccion(item.id)}>
+                  <MaterialIcons name="delete-outline" size={18} color="#555" />
+                </TouchableOpacity>
               </View>
             </View>
           )}
@@ -115,7 +197,18 @@ export default function TransaccionesScreen() {
       </View>
 
       {/*Botón flotante */}
-      <TouchableOpacity style={styles.fab}>
+      {fabOptionsVisible && (
+        <View style={styles.fabOptions}>
+          <TouchableOpacity style={styles.fabOption} onPress={() => abrirNuevo('Ingreso')}>
+            <Text style={{ fontWeight: '700' }}>Ingreso</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.fabOption, { backgroundColor: '#FFD6D6' }]} onPress={() => abrirNuevo('Egreso')}>
+            <Text style={{ fontWeight: '700' }}>Egreso</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      <TouchableOpacity style={styles.fab} onPress={() => setFabOptionsVisible((s) => !s)}>
         <Ionicons name="add" size={28} color="#fff" />
       </TouchableOpacity>
 
@@ -288,5 +381,52 @@ fab: {
     height: height * 0.15,
     zIndex: 2,
     
+  },
+  // Formulario inline
+  formInline: {
+    marginHorizontal: width * 0.05,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#eee',
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginTop: 8,
+  },
+  tipoButton: {
+    flex: 1,
+    paddingVertical: 8,
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  tipoActive: { backgroundColor: '#00A859', borderColor: '#00A859' },
+  tipoText: { color: '#333' },
+  tipoTextActive: { color: '#fff', fontWeight: '600' },
+  formButton: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 6, backgroundColor: '#E6E6E6' },
+  fabOptions: {
+    position: 'absolute',
+    right: Platform.OS === 'web' ? width * 0.08 : width * 0.06,
+    bottom: Platform.OS === 'web' ? height * 0.2 : height * 0.28,
+    zIndex: 10,
+    alignItems: 'flex-end',
+  },
+  fabOption: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
 });

@@ -7,10 +7,11 @@ import RecuperarContraseñaScreen from './RecuperarContraseñaScreen.js';
 import PrincipalScreen from './PrincipalScreen.js';
 import MetasScreen from './MetasScreen.js';
 import PresupuestosScreen from './PresupuestosScreen.js'
-import DefinirPresupuestoScreen from './DefinirPresupuestoScreen.js';
+
 import AnalisisScreen from './AnalisisScreen.js';
 import PerfilScreen from  './PerfilScreen.js'
 import TransaccionesScreen from './TransaccionesScreen.js'
+
 
 export default function MenuScreen(){
     const [screen, setScreen]=useState('menu');
@@ -27,8 +28,7 @@ export default function MenuScreen(){
             return <MetasScreen/>
         case 'presupuestos':
             return <PresupuestosScreen/>;
-        case 'defpresupuesto':
-            return <DefinirPresupuestoScreen/>;
+
         case 'analisis':
             return <AnalisisScreen/>;
         case 'perfil':
@@ -65,9 +65,7 @@ export default function MenuScreen(){
                             <Text style={styles.textoBoton}>Presupuestos</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={()=>setScreen('defpresupuesto')} style={styles.botones3}>
-                            <Text style={styles.textoBoton}>Definir Presupuestos</Text>
-                        </TouchableOpacity>
+
 
                         <TouchableOpacity onPress={()=>setScreen('analisis')} style={styles.botones3}>
                             <Text style={styles.textoBoton}>Análisis</Text>
@@ -77,9 +75,11 @@ export default function MenuScreen(){
                             <Text style={styles.textoBoton}>Perfil</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={()=>setScreen('transacciones')} style={styles.botones3}>
-                            <Text style={styles.textoBoton}>Transacciones</Text>
-                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={()=>setScreen('transacciones')} style={styles.botones3}>
+                                            <Text style={styles.textoBoton}>Transacciones</Text>
+                                        </TouchableOpacity>
+
+                              
 
                         </View>                        
                     </View>
