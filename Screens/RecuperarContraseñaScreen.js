@@ -1,24 +1,52 @@
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { useState } from "react";
 import MenuScreen from "./menuScreen";
+import UsuarioController from "../controllers/UsuarioController";
+
+const controller = new UsuarioController();
 
 export default function RecuperarContraseñaScreen() {
   const [nombre, setNombre] = useState('');
   const [correo, setCorreo] = useState('');
+  const [nuevaContra, setNuevaContra] = useState('');
   const [screen, setScreen] = useState('inicio');
+  const [usuario, setUsuario] = useState(null);
 
-  const enviar = () => {
+  const buscarUsuario = async () => {
     if (nombre.trim() === '' || correo.trim() === '') {
-      Alert.alert('Campos vacíos', 'Por favor completa todos los campos antes de continuar.');
-      return;
+      return Alert.alert('Campos vacíos', 'Por favor completa todos los campos antes de continuar.');
     }
-    Alert.alert('Solicitud enviada', 'Hemos enviado un enlace para restablecer tu contraseña.');
+
+    const res = await controller.buscarUsuario(nombre, correo);
+
+    if (res.error) return Alert.alert('Error', res.error);
+
+    if (res.datos.length === 0) {
+      return Alert.alert('No encontrado', 'No existe un usuario con esos datos.');
+    }
+
+    setUsuario(res.datos[0]);
+    setScreen('cambiar');
+  };
+
+  const cambiarContrasena = async () => {
+    if (nuevaContra.trim().length < 4) {
+      return Alert.alert('Error', 'La contraseña debe tener mínimo 4 caracteres.');
+    }
+
+    const res = await controller.actualizarContrasena(usuario.id, nuevaContra);
+
+    if (res.error) return Alert.alert('Error', res.error);
+
+    Alert.alert('Éxito', 'La contraseña ha sido actualizada.');
+    setScreen('regresar');
   };
 
   switch (screen) {
     case 'regresar':
       return <MenuScreen />;
 
+    // ---------------------------
     case 'inicio':
     default:
       return (
@@ -44,8 +72,29 @@ export default function RecuperarContraseñaScreen() {
             onChangeText={setCorreo}
           />
 
-          <TouchableOpacity style={styles.botones} onPress={enviar}>
+          <TouchableOpacity style={styles.botones} onPress={buscarUsuario}>
             <Text style={styles.textoBoton}>ENVIAR</Text>
+          </TouchableOpacity>
+        </View>
+      );
+
+    // ---------------------------
+    case 'cambiar':
+      return (
+        <View style={styles.container}>
+          <Text style={styles.texto}>Cambiar contraseña</Text>
+
+          <Text style={styles.texto2}>Nueva contraseña</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nueva contraseña"
+            secureTextEntry
+            value={nuevaContra}
+            onChangeText={setNuevaContra}
+          />
+
+          <TouchableOpacity style={styles.botones} onPress={cambiarContrasena}>
+            <Text style={styles.textoBoton}>CAMBIAR</Text>
           </TouchableOpacity>
         </View>
       );
