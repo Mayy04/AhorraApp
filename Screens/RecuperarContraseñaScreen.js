@@ -2,11 +2,11 @@ import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'reac
 import { useState } from "react";
 import MenuScreen from "./menuScreen";
 
-export default function OlvidarContrasena() {
+export default function RecuperarContraseñaScreen() {
   const [nombre, setNombre] = useState('');
   const [correo, setCorreo] = useState('');
-   const [screen, setScreen]=useState('inicio');
-  
+  const [screen, setScreen] = useState('inicio');
+
   const enviar = () => {
     if (nombre.trim() === '' || correo.trim() === '') {
       Alert.alert('Campos vacíos', 'Por favor completa todos los campos antes de continuar.');
@@ -14,41 +14,42 @@ export default function OlvidarContrasena() {
     }
     Alert.alert('Solicitud enviada', 'Hemos enviado un enlace para restablecer tu contraseña.');
   };
-switch(screen){
+
+  switch (screen) {
     case 'regresar':
-      return<MenuScreen/>
+      return <MenuScreen />;
+
     case 'inicio':
-      default:
-  return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={()=> setScreen('regresar')}>
-        <Text style={styles.texto}>¿Olvidaste tu contraseña?</Text>
-      </TouchableOpacity>
-      
+    default:
+      return (
+        <View style={styles.container}>
+          <TouchableOpacity onPress={() => setScreen('regresar')}>
+            <Text style={styles.texto}>¿Olvidaste tu contraseña?</Text>
+          </TouchableOpacity>
 
-      <Text style={styles.texto2}>Ingresa tu nombre</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre"
-        value={nombre}
-        onChangeText={setNombre}
-      />
+          <Text style={styles.texto2}>Ingresa tu nombre</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nombre"
+            value={nombre}
+            onChangeText={setNombre}
+          />
 
-      <Text style={styles.texto2}>Ingresa tu correo electrónico</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Correo electrónico"
-        keyboardType="email-address"
-        value={correo}
-        onChangeText={setCorreo}
-      />
+          <Text style={styles.texto2}>Ingresa tu correo electrónico</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Correo electrónico"
+            keyboardType="email-address"
+            value={correo}
+            onChangeText={setCorreo}
+          />
 
-      <TouchableOpacity style={styles.botones} onPress={enviar}>
-        <Text style={styles.textoBoton}>ENVIAR</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
+          <TouchableOpacity style={styles.botones} onPress={enviar}>
+            <Text style={styles.textoBoton}>ENVIAR</Text>
+          </TouchableOpacity>
+        </View>
+      );
+  }
 }
 
 const styles = StyleSheet.create({
