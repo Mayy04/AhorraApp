@@ -7,9 +7,11 @@ import RecuperarContraseñaScreen from './RecuperarContraseñaScreen.js';
 import PrincipalScreen from './PrincipalScreen.js';
 import MetasScreen from './MetasScreen.js';
 import PresupuestosScreen from './PresupuestosScreen.js'
+
 import AnalisisScreen from './AnalisisScreen.js';
 import PerfilScreen from  './PerfilScreen.js'
 import TransaccionesScreen from './TransaccionesScreen.js'
+
 
 export default function MenuScreen(){
     const [screen, setScreen]=useState('menu');
@@ -26,6 +28,7 @@ export default function MenuScreen(){
             return <MetasScreen/>
         case 'presupuestos':
             return <PresupuestosScreen/>;
+
         case 'analisis':
             return <AnalisisScreen/>;
         case 'perfil':
@@ -42,6 +45,10 @@ export default function MenuScreen(){
                             <Text style={styles.textoBoton}>Inicio de Sesión</Text>
                         </TouchableOpacity>
                         
+                        <TouchableOpacity onPress={()=>setScreen('principal')} style={styles.botones3}>
+                            <Text style={styles.textoBoton}>Pantalla Principal</Text>
+                        </TouchableOpacity>
+
                         <TouchableOpacity onPress={()=>setScreen('registro')} style={styles.botones3}>
                             <Text style={styles.textoBoton}>Registro</Text>
                         </TouchableOpacity>
@@ -58,6 +65,8 @@ export default function MenuScreen(){
                             <Text style={styles.textoBoton}>Presupuestos</Text>
                         </TouchableOpacity>
 
+
+
                         <TouchableOpacity onPress={()=>setScreen('analisis')} style={styles.botones3}>
                             <Text style={styles.textoBoton}>Análisis</Text>
                         </TouchableOpacity>
@@ -66,9 +75,11 @@ export default function MenuScreen(){
                             <Text style={styles.textoBoton}>Perfil</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={()=>setScreen('transacciones')} style={styles.botones3}>
-                            <Text style={styles.textoBoton}>Transacciones</Text>
-                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={()=>setScreen('transacciones')} style={styles.botones3}>
+                                            <Text style={styles.textoBoton}>Transacciones</Text>
+                                        </TouchableOpacity>
+
+                              
 
                         </View>                        
                     </View>

@@ -1,7 +1,14 @@
 import React from 'react';
-import { View, Text, Image, ImageBackground, StyleSheet, Dimensions } from 'react-native';
-
+import { View, Text, Image, ImageBackground, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
+import MenuScreen from './menuScreen';
 export default function PrincipalScreen() {
+   const [screen, setScreen]=useState('inicio');
+  switch(screen){
+    case 'regresar':
+      return<MenuScreen/>
+    case 'inicio':
+      default:
   return (
     <ImageBackground
       source={require('../assets/fondo.png')}
@@ -10,10 +17,13 @@ export default function PrincipalScreen() {
       <View style={styles.container}>
         {/* Encabezado */}
         <View style={styles.header}>
-          <Image
+          <TouchableOpacity onPress={()=> setScreen('regresar')}>
+            <Image
             source={require('../assets/logoAhorra_2.png')}
             style={styles.logo}
           />
+          </TouchableOpacity>
+          
           <Text style={styles.saludo}>Hola, Usuario</Text>
 
           <View style={styles.balanceCard}>
@@ -53,6 +63,7 @@ export default function PrincipalScreen() {
       </View>
     </ImageBackground>
   );
+}
 }
 
 const { width, height } = Dimensions.get('window');

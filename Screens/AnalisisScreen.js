@@ -1,9 +1,15 @@
 import React from "react";
-import {View, Text, StyleSheet, Image, ImageBackground, Dimensions, Platform,} from "react-native";
-
+import {View, Text, StyleSheet, Image, ImageBackground, Dimensions, Platform, TouchableOpacity,} from "react-native";
 const { width, height } = Dimensions.get("window");
-
+import { useState } from "react";
+import MenuScreen from "./menuScreen";
 export default function AnalisisScreen() {
+  const [screen, setScreen]=useState('inicio');
+  switch(screen){
+    case 'regresar':
+      return<MenuScreen/>
+    case 'inicio':
+      default:
   return (
     <View style={styles.container}>
       {/*Fondo verde*/}
@@ -13,11 +19,13 @@ export default function AnalisisScreen() {
         resizeMode="stretch"
       >
         <View style={styles.headerOverlay}>
-          <Image
+          <TouchableOpacity onPress={()=> setScreen('regresar')}>
+            <Image
             source={require("../assets/logoAhorra_2.png")}
             style={styles.logo}
             resizeMode="contain"
           />
+          </TouchableOpacity>
           <Text style={styles.headerTitle}>Análisis</Text>
         </View>
       </ImageBackground>
@@ -45,7 +53,7 @@ export default function AnalisisScreen() {
     </View>
   );
 }
-
+}
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 

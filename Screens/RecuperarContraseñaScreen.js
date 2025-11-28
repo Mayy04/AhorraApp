@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { useState } from "react";
+import MenuScreen from "./menuScreen";
 
 export default function OlvidarContrasena() {
   const [nombre, setNombre] = useState('');
   const [correo, setCorreo] = useState('');
-
+   const [screen, setScreen]=useState('inicio');
+  
   const enviar = () => {
     if (nombre.trim() === '' || correo.trim() === '') {
       Alert.alert('Campos vacíos', 'Por favor completa todos los campos antes de continuar.');
@@ -12,10 +14,17 @@ export default function OlvidarContrasena() {
     }
     Alert.alert('Solicitud enviada', 'Hemos enviado un enlace para restablecer tu contraseña.');
   };
-
+switch(screen){
+    case 'regresar':
+      return<MenuScreen/>
+    case 'inicio':
+      default:
   return (
     <View style={styles.container}>
-      <Text style={styles.texto}>¿Olvidaste tu contraseña?</Text>
+      <TouchableOpacity onPress={()=> setScreen('regresar')}>
+        <Text style={styles.texto}>¿Olvidaste tu contraseña?</Text>
+      </TouchableOpacity>
+      
 
       <Text style={styles.texto2}>Ingresa tu nombre</Text>
       <TextInput
@@ -39,6 +48,7 @@ export default function OlvidarContrasena() {
       </TouchableOpacity>
     </View>
   );
+}
 }
 
 const styles = StyleSheet.create({
