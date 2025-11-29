@@ -3,15 +3,12 @@ import { NavigationContainer } from "@react-navigation/native"
 import {Ionicons} from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-
-
 import PrincipalScreen from "./PrincipalScreen";
 import TransaccionesScreen from "./TransaccionesScreen";
 import PerfilScreen from "./PerfilScreen";
 import PresupuestosScreen from "./PresupuestosScreen";
 
 const Tab =createBottomTabNavigator();
-
 
 export default function Navbar(){
     const insets =useSafeAreaInsets();

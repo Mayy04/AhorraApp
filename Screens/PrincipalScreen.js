@@ -1,100 +1,119 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, ImageBackground, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MenuScreen from './menuScreen';
-export default function PrincipalScreen() {
-   const [screen, setScreen]=useState('inicio');
-  switch(screen){
+
+export default function PrincipalScreen({ navigation }) {
+  const [screen, setScreen] = useState('inicio');
+
+  switch(screen) {
     case 'regresar':
-      return<MenuScreen/>
+      return <MenuScreen />;
     case 'inicio':
-      default:
-  return (
-    <ImageBackground
-      source={require('../assets/fondo.png')}
-      style={styles.background}
-    >
-      <View style={styles.container}>
-        {/* Encabezado */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={()=> setScreen('regresar')}>
+    default:
+
+      return (
+        <ImageBackground
+          source={require('../assets/fondo.png')}
+          style={styles.background}
+        >
+          <View style={styles.container}>
+            {/* Encabezado */}
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => setScreen('regresar')}>
+                <Image
+                  source={require('../assets/logoAhorra_2.png')}
+                  style={styles.logo}
+                />
+              </TouchableOpacity>
+              
+              <Text style={styles.saludo}>Hola, Usuario</Text>
+
+              <View style={styles.balanceCard}>
+                <Text style={styles.balanceTitle}>Saldo disponible</Text>
+                <Text style={styles.balanceAmount}>$5,650.00</Text>
+              </View>
+            </View>
+
+            {/* Contenido principal */}
+            <View style={styles.main}>
+              <View style={styles.row}>
+                <TouchableOpacity 
+                  style={styles.option}
+                  onPress={() => navigation.navigate('Transacciones')}
+                >
+                  <MaterialCommunityIcons name="account-plus" size={32} color="#007b4a" />
+                  <Text style={styles.optionText}>Registrar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={styles.option}
+                  onPress={() => navigation.navigate('Analisis')}
+                >
+                  <MaterialCommunityIcons name="chart-line" size={32} color="#007b4a" />
+                  <Text style={styles.optionText}>Análisis</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.row}>
+                <TouchableOpacity 
+                  style={styles.option}
+                  onPress={() => navigation.navigate('Presupuestos')}
+                >
+                  <MaterialCommunityIcons name="file-document-outline" size={32} color="#007b4a" />
+                  <Text style={styles.optionText}>Presupuestos</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={styles.option}
+                  onPress={() => navigation.navigate('Metas')}
+                >
+                  <MaterialCommunityIcons name="target" size={32} color="#007b4a" />
+                  <Text style={styles.optionText}>Metas</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Barra inferior */}
             <Image
-            source={require('../assets/logoAhorra_2.png')}
-            style={styles.logo}
-          />
-          </TouchableOpacity>
-          
-          <Text style={styles.saludo}>Hola, Usuario</Text>
-
-          <View style={styles.balanceCard}>
-            <Text style={styles.balanceTitle}>Saldo disponible</Text>
-            <Text style={styles.balanceAmount}>$5,650.00</Text>
+              source={require('../assets/navbar.png')}
+              style={styles.navbar}
+            />
           </View>
-        </View>
-
-        {/* Contenido principal */}
-        <View style={styles.main}>
-          <View style={styles.row}>
-            <View style={styles.option}>
-              <Text style={styles.optionText}>Registrar</Text>
-            </View>
-
-            <View style={styles.option}>
-              <Text style={styles.optionText}>Análisis</Text>
-            </View>
-          </View>
-
-          <View style={styles.row}>
-            <View style={styles.option}>
-              <Text style={styles.optionText}>Presupuestos</Text>
-            </View>
-
-            <View style={styles.option}>
-              <Text style={styles.optionText}>Metas</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Barra inferior */}
-        <Image
-          source={require('../assets/navbar.png')}
-          style={styles.navbar}
-        />
-      </View>
-    </ImageBackground>
-  );
-}
+        </ImageBackground>
+      );
+  }
 }
 
 const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    resizeMode: 'cover',
+  background: { 
+    flex: 1, 
+    resizeMode: 'cover' 
   },
-  container: {
-    flex: 1,
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  container: { 
+    flex: 1, 
+    justifyContent: 'space-between', 
+    alignItems: 'center'
   },
-  header: {
-    width: '100%',
-    alignItems: 'center',
-    marginTop: height * 0.06,
+  header: { 
+    width: '100%', 
+    alignItems: 'center', 
+    marginTop: height * 0.06 
   },
-  logo: {
-    width: 140,
-    height: 90,
-    resizeMode: 'contain',
-    marginBottom: 10,
+  logo: { 
+    width: 140, 
+    height: 90, 
+    resizeMode: 'contain', 
+    marginBottom: 10 
   },
-  saludo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#ffffffff',
-    marginTop: 10,
-    marginBottom: 5,
+  saludo: { 
+    fontSize: 22, 
+    fontWeight: 'bold', 
+    color: '#ffffffff', 
+    marginTop: 10, 
+    marginBottom: 5 
   },
   balanceCard: {
     backgroundColor: '#ffffffcc',
@@ -107,28 +126,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
   },
-  balanceTitle: {
-    color: '#007b4a',
-    fontWeight: 'bold',
-    fontSize: 16,
+  balanceTitle: { 
+    color: '#007b4a', 
+    fontWeight: 'bold', 
+    fontSize: 16 
   },
-  balanceAmount: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 5,
-    color: '#007b4a',
+  balanceAmount: { 
+    fontSize: 22, 
+    fontWeight: 'bold', 
+    marginTop: 5, 
+    color: '#007b4a' 
   },
-  main: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+  main: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    width: '100%' 
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '85%',
-    marginVertical: 15,
+  row: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-around', 
+    width: '85%', 
+    marginVertical: 15 
   },
   option: {
     backgroundColor: '#ffffffdd',
@@ -142,14 +161,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
   },
-  optionText: {
-    fontSize: 14,
-    color: '#007b4a',
-    fontWeight: 'bold',
+  optionText: { 
+    fontSize: 14, 
+    color: '#007b4a', 
+    fontWeight: 'bold', 
+    marginTop: 5 
   },
-  navbar: {
-    width: width,
-    height: 65,
-    resizeMode: 'contain',
+  navbar: { 
+    width: width, 
+    height: 65, 
+    resizeMode: 'contain' 
   },
 });
