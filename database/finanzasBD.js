@@ -6,7 +6,7 @@ export const iniciarbd=()=>{
     db.transaction(tx=>{
         tx.executeSql(
             `CREATE TABLE IF NOT EXISTS transacciones(
-            id INTERGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             tipo TEXT,
             monto REAL,
             categoria TEXT,
@@ -16,7 +16,7 @@ export const iniciarbd=()=>{
     
         tx.executeSql(
             `CREATE TABLE IF NOT EXISTS presupuestos(
-            id INTERGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT,
             monto REAL,
             fecha TEXT
