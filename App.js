@@ -4,9 +4,3 @@ export default function App() {
     <MenuScreen/>
   );
 }
-import MenuScreen from './Screens/menuScreen.js';
-export default function App() {
-  return (
-    <MenuScreen/>
-  );
-}
