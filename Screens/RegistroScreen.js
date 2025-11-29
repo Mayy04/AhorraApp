@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from "react-native";
-import UsuarioController from "../controllers/UsuarioController";
+import UsuarioController from "../controllers/usuarioControllers";
 import MenuScreen from "./menuScreen";
 
 const controller = new UsuarioController();

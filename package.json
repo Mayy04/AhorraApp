@@ -9,7 +9,8 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~54.0.13",
+    "expo": "~54.0.25",
+    "expo-sqlite": "^16.0.9",
     "expo-status-bar": "~3.0.8",
     "react": "^19.2.0",
     "react-dom": "19.2.0",

@@ -1,7 +1,7 @@
+import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import { useState } from "react";
 import MenuScreen from "./menuScreen";
-import UsuarioController from "../controllers/UsuarioController";
+import UsuarioController from "../controllers/usuarioControllers";
 
 const controller = new UsuarioController();
 
@@ -12,46 +12,72 @@ export default function RecuperarContraseñaScreen() {
   const [screen, setScreen] = useState('inicio');
   const [usuario, setUsuario] = useState(null);
 
+  // ------------------------
+  // BUSCAR USUARIO (ENVIAR)
+  // ------------------------
   const buscarUsuario = async () => {
+    console.log("buscarUsuario: inicio");                
+    Alert.alert("DEBUG", "buscarUsuario ejecutada");     
+
     if (nombre.trim() === '' || correo.trim() === '') {
       return Alert.alert('Campos vacíos', 'Por favor completa todos los campos antes de continuar.');
     }
 
-    const res = await controller.buscarUsuario(nombre, correo);
+    try {
+      const res = await controller.buscarUsuario(nombre, correo);
+      console.log("buscarUsuario: res =>", res);
 
-    if (res.error) return Alert.alert('Error', res.error);
+      if (!res) {
+        return Alert.alert('Error', 'Respuesta inválida del controlador (res es undefined).');
+      }
 
-    if (res.datos.length === 0) {
-      return Alert.alert('No encontrado', 'No existe un usuario con esos datos.');
+      if (res.error) return Alert.alert('Error', res.error);
+
+      if (!res.datos || res.datos.length === 0) {
+        return Alert.alert('No encontrado', 'No existe un usuario con esos datos.');
+      }
+
+      setUsuario(res.datos[0]);
+      setScreen('cambiar');
+    } catch (e) {
+      console.log("buscarUsuario: excepción =>", e);
+      return Alert.alert('Error', 'Ocurrió un error al buscar el usuario: ' + (e.message || e));
     }
-
-    setUsuario(res.datos[0]);
-    setScreen('cambiar');
   };
 
+  // ------------------------
+  // CAMBIAR CONTRASEÑA
+  // ------------------------
   const cambiarContrasena = async () => {
     if (nuevaContra.trim().length < 4) {
       return Alert.alert('Error', 'La contraseña debe tener mínimo 4 caracteres.');
     }
 
-    const res = await controller.actualizarContrasena(usuario.id, nuevaContra);
+    try {
+      const res = await controller.actualizarContrasena(usuario.id, nuevaContra);
+      console.log("cambiarContrasena: res =>", res);
 
-    if (res.error) return Alert.alert('Error', res.error);
+      if (res.error) return Alert.alert('Error', res.error);
 
-    Alert.alert('Éxito', 'La contraseña ha sido actualizada.');
-    setScreen('regresar');
+      Alert.alert('Éxito', 'La contraseña ha sido actualizada.');
+      setScreen('regresar');
+    } catch (e) {
+      console.log("cambiarContrasena: excepción =>", e);
+      Alert.alert('Error', 'Ocurrió un error al actualizar la contraseña: ' + (e.message || e));
+    }
   };
 
   switch (screen) {
     case 'regresar':
       return <MenuScreen />;
 
-    // ---------------------------
     case 'inicio':
     default:
       return (
         <View style={styles.container}>
-          <TouchableOpacity onPress={() => setScreen('regresar')}>
+
+          {/* botón regresar: mantengo pero reduje su área táctil con hitSlop */}
+          <TouchableOpacity onPress={() => setScreen('regresar')} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
             <Text style={styles.texto}>¿Olvidaste tu contraseña?</Text>
           </TouchableOpacity>
 
@@ -70,15 +96,16 @@ export default function RecuperarContraseñaScreen() {
             keyboardType="email-address"
             value={correo}
             onChangeText={setCorreo}
+            autoCapitalize="none"
           />
 
+          {/* ENVIAR: aseguramos onPress y mostramos log antes de invocar controller */}
           <TouchableOpacity style={styles.botones} onPress={buscarUsuario}>
             <Text style={styles.textoBoton}>ENVIAR</Text>
           </TouchableOpacity>
         </View>
       );
 
-    // ---------------------------
     case 'cambiar':
       return (
         <View style={styles.container}>
@@ -137,6 +164,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: 10,
     width: '60%',
+    alignItems: 'center'
   },
   textoBoton: {
     color: '#fff',
