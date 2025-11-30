@@ -85,5 +85,22 @@ const usuarioService = new UsuarioService();
           onChangeText={setConfirmar} 
           placeholderTextColor="#999"
         />
-         
-} 
+         <TouchableOpacity 
+          style={[styles.boton, cargando && styles.botonDeshabilitado]} 
+          onPress={registrar}
+          disabled={cargando}
+        >
+          <Text style={styles.botonTexto}>
+            {cargando ? "CREANDO CUENTA..." : "CREAR CUENTA"}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.botonSecundario} onPress={irALogin}>
+          <Text style={styles.botonSecundarioTexto}>
+            ¿Ya tienes cuenta? Inicia sesión
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+}
