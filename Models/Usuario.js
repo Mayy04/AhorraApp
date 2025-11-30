@@ -1,31 +1,30 @@
-export class Usuario {
-    constructor(id, nombre, correo, telefono, contrasena, fechaCreacion) {
-        this.id = id;
-        this.nombre = nombre;
-        this.correo = correo;
-        this.telefono = telefono;
-        this.contrasena = contrasena;
-        this.fechaCreacion = fechaCreacion || new Date().toISOString();
+export default class Usuario {
+  constructor(nombre, correo, telefono, contrasena) {
+    this.nombre = nombre;
+    this.correo = correo;
+    this.telefono = telefono;
+    this.contrasena = contrasena;
+  }
+
+
+  // Validaciones 
+  validar() {
+    if (!this.nombre || this.nombre.trim().length < 3) {
+      return "El nombre debe tener al menos 3 caracteres.";
     }
 
-    // Validación para registrar usuario
-    static validarRegistro(nombre, correo, telefono, contrasena, confirmar) {
-        if (!nombre || !correo || !telefono || !contrasena || !confirmar)
-            throw new Error("Todos los campos son obligatorios");
-
-        if (!correo.includes("@"))
-            throw new Error("El correo no es válido");
-
-        if (contrasena !== confirmar)
-            throw new Error("Las contraseñas no coinciden");
+    if (!this.correo || !this.correo.includes("@")) {
+      return "El correo electrónico no es válido.";
     }
 
-    // Validación para cambiar contraseña
-    static validarCambio(nueva, confirmar) {
-        if (!nueva || !confirmar)
-            throw new Error("Escribe ambas contraseñas");
-
-        if (nueva !== confirmar)
-            throw new Error("Las contraseñas no coinciden");
+    if (!this.telefono || this.telefono.length < 10) {
+      return "El número telefónico debe tener mínimo 10 dígitos.";
     }
+
+    if (!this.contrasena || this.contrasena.length < 4) {
+      return "La contraseña debe tener mínimo 4 caracteres.";
+    }
+
+    return null;
+  }
 }
