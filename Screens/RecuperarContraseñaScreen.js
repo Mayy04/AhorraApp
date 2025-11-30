@@ -153,7 +153,108 @@ export default function RecuperarContraseñaScreen() {
                          onPress={verificarUsuario}
                          disabled={!validarCorreo() || !validarTelefono() || cargando}
                        >
-                         <Text style={styles.botonPrincipalTexto}>
+                         <Text style={styles.botonPrincipalTexto}>          {/* Paso 2: Nueva Contraseña */}
+                                   {paso === 2 && (
+                                     <View style={styles.formContainer}>
+                                       {/* Información del usuario verificado */}
+                                       {usuarioVerificado && (
+                                         <View style={styles.usuarioVerificado}>
+                                           <Ionicons name="checkmark-circle" size={24} color="#00A859" />
+                                           <View style={styles.usuarioInfo}>
+                                             <Text style={styles.usuarioNombre}>{usuarioVerificado.nombre}</Text>
+                                             <Text style={styles.usuarioCorreo}>{usuarioVerificado.correo}</Text>
+                                           </View>
+                                         </View>
+                                       )}
+                         
+                                       <View style={styles.inputGroup}>
+                                         <Text style={styles.label}>
+                                           <Ionicons name="lock-closed-outline" size={16} color="#007b4a" /> Nueva contraseña
+                                         </Text>
+                                         <TextInput
+                                           style={[
+                                             styles.input,
+                                             nuevaContrasena && nuevaContrasena.length >= 4 && styles.inputValido
+                                           ]}
+                                           placeholder="Mínimo 4 caracteres"
+                                           value={nuevaContrasena}
+                                           onChangeText={setNuevaContrasena}
+                                           secureTextEntry
+                                           placeholderTextColor="#999"
+                                         />
+                                         {nuevaContrasena && nuevaContrasena.length < 4 && (
+                                           <Text style={styles.errorText}>Mínimo 4 caracteres</Text>
+                                         )}
+                                       </View>
+                         
+                                       <View style={styles.inputGroup}>
+                                         <Text style={styles.label}>
+                                           <Ionicons name="lock-closed-outline" size={16} color="#007b4a" /> Confirmar contraseña
+                                         </Text>
+                                         <TextInput
+                                           style={[
+                                             styles.input,
+                                             confirmarContrasena && nuevaContrasena === confirmarContrasena && styles.inputValido,
+                                             confirmarContrasena && nuevaContrasena !== confirmarContrasena && styles.inputError
+                                           ]}
+                                           placeholder="Repite tu contraseña"
+                                           value={confirmarContrasena}
+                                           onChangeText={setConfirmarContrasena}
+                                           secureTextEntry
+                                           placeholderTextColor="#999"
+                                         />
+                                         {confirmarContrasena && nuevaContrasena !== confirmarContrasena && (
+                                           <Text style={styles.errorText}>Las contraseñas no coinciden</Text>
+                                         )}
+                                         {confirmarContrasena && nuevaContrasena === confirmarContrasena && (
+                                           <Text style={styles.successText}>✓ Las contraseñas coinciden</Text>
+                                         )}
+                                       </View>
+                         
+                                       <View style={styles.requisitosContrasena}>
+                                         <Text style={styles.requisitosTitulo}>Requisitos de contraseña:</Text>
+                                         <Text style={[
+                                           styles.requisito,
+                                           nuevaContrasena.length >= 4 && styles.requisitoCumplido
+                                         ]}>
+                                           Mínimo 4 caracteres
+                                         </Text>
+                                         <Text style={[
+                                           styles.requisito,
+                                           nuevaContrasena === confirmarContrasena && confirmarContrasena && styles.requisitoCumplido
+                                         ]}>
+                                           Las contraseñas coinciden
+                                         </Text>
+                                       </View>
+                         
+                                       <TouchableOpacity
+                                         style={[
+                                           styles.botonPrincipal,
+                                           (!validarContrasenas() || cargando) && styles.botonDeshabilitado
+                                         ]}
+                                         onPress={cambiarContrasena}
+                                         disabled={!validarContrasenas() || cargando}
+                                       >
+                                         <Text style={styles.botonPrincipalTexto}>
+                                           {cargando ? 'ACTUALIZANDO...' : 'ACTUALIZAR CONTRASEÑA'}
+                                         </Text>
+                                       </TouchableOpacity>
+                         
+                                       <View style={styles.botonesSecundarios}>
+                                         <TouchableOpacity style={styles.botonSecundario} onPress={reiniciarProceso}>
+                                           <Text style={styles.botonSecundarioTexto}>
+                                              Volver a verificación
+                                           </Text>
+                                         </TouchableOpacity>
+                                         <TouchableOpacity style={styles.botonSecundario} onPress={volverAlLogin}>
+                                           <Text style={styles.botonSecundarioTexto}>
+                                             Iniciar sesión
+                                           </Text>
+                                         </TouchableOpacity>
+                                       </View>
+                                     </View>
+                                   )}
+                         
                            {cargando ? 'VERIFICANDO...' : 'VERIFICAR IDENTIDAD'}
                          </Text>
                        </TouchableOpacity>
@@ -165,7 +266,14 @@ export default function RecuperarContraseñaScreen() {
                        </TouchableOpacity>
                      </View>
                    )}
-                   
+              
+          {/* Información de seguridad */}
+               <View style={styles.infoSeguridad}>
+                     <Ionicons name="shield-checkmark-outline" size={16} color="#666" />
+                      <Text style={styles.infoSeguridadTexto}>
+                        Tus datos están protegidos y seguros
+                    </Text>
+               </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
