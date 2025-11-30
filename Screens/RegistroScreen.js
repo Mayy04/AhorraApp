@@ -34,4 +34,56 @@ const usuarioService = new UsuarioService();
       setNombre(""); setCorreo(""); setTelefono(""); setContrasena(""); setConfirmar("");
     }
  };
+
+ const irALogin =() =>{
+  navigation.navigate('InicioSesion');
+ };
+
+  return (
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.titulo}>Crear Cuenta</Text>
+        <Text style={styles.subtitulo}>Comienza tu viaje financiero</Text>
+
+        <TextInput 
+          style={styles.input} 
+          placeholder="Nombre completo" 
+          value={nombre} 
+          onChangeText={setNombre} 
+          placeholderTextColor="#999"
+        />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Correo electrónico" 
+          value={correo} 
+          onChangeText={setCorreo}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholderTextColor="#999"
+        />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Teléfono" 
+          value={telefono} 
+          onChangeText={setTelefono}
+          keyboardType="phone-pad"
+          placeholderTextColor="#999"
+        />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Contraseña" 
+          secureTextEntry 
+          value={contrasena} 
+          onChangeText={setContrasena} 
+          placeholderTextColor="#999"
+        />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Confirmar contraseña" 
+          secureTextEntry 
+          value={confirmar} 
+          onChangeText={setConfirmar} 
+          placeholderTextColor="#999"
+        />
+         
 } 
