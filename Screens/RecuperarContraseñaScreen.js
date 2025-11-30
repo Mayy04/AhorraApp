@@ -107,6 +107,68 @@ export default function RecuperarContraseñaScreen() {
                   </View>
                 </View>
               </View>
+                   {/* Paso 1: Verificación */}
+                   {paso === 1 && (
+                     <View style={styles.formContainer}>
+                       <View style={styles.inputGroup}>
+                         <Text style={styles.label}>
+                           <Ionicons name="mail-outline" size={16} color="#007b4a" /> Correo electrónico
+                         </Text>
+                         <TextInput
+                           style={[styles.input, correo && validarCorreo() && styles.inputValido]}
+                           placeholder="tu@correo.com"
+                           value={correo}
+                           onChangeText={setCorreo}
+                           keyboardType="email-address"
+                           autoCapitalize="none"
+                           placeholderTextColor="#999"
+                         />
+                         {correo && !validarCorreo() && (
+                           <Text style={styles.errorText}>Correo electrónico no válido</Text>
+                         )}
+                       </View>
+         
+                       <View style={styles.inputGroup}>
+                         <Text style={styles.label}>
+                           <Ionicons name="call-outline" size={16} color="#007b4a" /> Teléfono
+                         </Text>
+                         <TextInput
+                           style={[styles.input, telefono && validarTelefono() && styles.inputValido]}
+                           placeholder="1234567890"
+                           value={telefono}
+                           onChangeText={setTelefono}
+                           keyboardType="phone-pad"
+                           placeholderTextColor="#999"
+                         />
+                         {telefono && !validarTelefono() && (
+                           <Text style={styles.errorText}>Mínimo 10 dígitos</Text>
+                         )}
+                       </View>
+         
+                       <TouchableOpacity
+                         style={[
+                           styles.botonPrincipal,
+                           (!validarCorreo() || !validarTelefono() || cargando) && styles.botonDeshabilitado
+                         ]}
+                         onPress={verificarUsuario}
+                         disabled={!validarCorreo() || !validarTelefono() || cargando}
+                       >
+                         <Text style={styles.botonPrincipalTexto}>
+                           {cargando ? 'VERIFICANDO...' : 'VERIFICAR IDENTIDAD'}
+                         </Text>
+                       </TouchableOpacity>
+         
+                       <TouchableOpacity style={styles.botonSecundario} onPress={volverAlLogin}>
+                         <Text style={styles.botonSecundarioTexto}>
+                            Volver al inicio de sesión
+                         </Text>
+                       </TouchableOpacity>
+                     </View>
+                   )}
+                   
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
       
