@@ -2,185 +2,191 @@ import React from 'react';
 import { View, Text, Image, ImageBackground, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-export default function PerfilScreen({ navigation }) {
-  const [notificaciones, setNotificaciones] = useState(true);
-  const [screen, setScreen] = useState('inicio');
+export default function PerfilScreen({ route }) {
+  const navigation = useNavigation();
+  const usuario = route.params?.usuario || { 
+    id: 1, 
+    nombre: 'Usuario Demo', 
+    correo: 'demo@ahorraplus.com',
+    telefono: '1234567890'
+  };
 
-  switch(screen) {
-    case 'regresar':
-      return <MenuScreen />;
-    case 'inicio':
-    default:
+  const cerrarSesion = () => {
+    // Navegar al inicio de sesión
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'InicioSesion' }],
+    });
+  };
 
-      return (
-        <ImageBackground
-          source={require('../assets/fondo.png')}
-          style={styles.background}
-        >
-          <View style={styles.container}>
-            {/* Encabezado */}
-            <View style={styles.header}>
-              <TouchableOpacity onPress={() => setScreen('regresar')}>
-                <Image
-                  source={require('../assets/logoAhorra_2.png')}
-                  style={styles.logo}
-                />
-              </TouchableOpacity>
-
-              <View style={styles.profileHeader}>
-                <Image
-                  source={require('../assets/Perfil.png')}
-                  style={styles.avatar}
-                />
-                <Text style={styles.nombre}>Alvaro Ochoa</Text>
-              </View>
-            </View>
-
-            {/* Cuerpo */}
-            <View style={styles.main}>
-              <Text style={styles.info}>Correo: alvaro@gmail.com</Text>
-              <Text style={styles.info}>Teléfono: 44234567890</Text>
-
-              <Text style={styles.seccion}>Preferencias</Text>
-
-              <View style={styles.switchRow}>
-                <Switch
-                  value={notificaciones}
-                  onValueChange={setNotificaciones}
-                  trackColor={{ false: '#ccc', true: '#007b4a' }}
-                  thumbColor={'#fff'}
-                />
-                <Text style={styles.prefText}>Notificaciones por correo activas</Text>
-              </View>
-
-              {/* Cambiar contraseña */}
-              <TouchableOpacity
-                style={styles.btnCambiar}
-                onPress={() => Alert.alert(
-                  'Cambiar contraseña'
-                )}
-              >
-                <Text style={styles.btnCambiarText}>Cambiar contraseña</Text>
-              </TouchableOpacity>
-
-              {/* Cerrar sesión */}
-              <TouchableOpacity
-                style={styles.btnCerrar}
-                onPress={() => navigation.navigate('InicioSesion')}
-              >
-                <Text style={styles.btnCerrarText}>Cerrar sesión</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Barra inferior */}
+  return (
+    <ImageBackground
+      source={require('../assets/fondo.png')}
+      style={styles.background}
+    >
+      <View style={styles.container}>
+        {/* Encabezado */}
+        <View style={styles.header}>
+          <Image
+            source={require('../assets/logoAhorra_2.png')}
+            style={styles.logo}
+          />
+          
+          <View style={styles.profileHeader}>
             <Image
-              source={require('../assets/navbar.png')}
-              style={styles.navbar}
+              source={require('../assets/Perfil.png')}
+              style={styles.avatar}
             />
+            <Text style={styles.nombre}>{usuario.nombre}</Text>
           </View>
-        </ImageBackground>
-      );
-  }
+        </View>
+
+        {/* Cuerpo */}
+        <View style={styles.main}>
+          <View style={styles.infoContainer}>
+            <Text style={styles.infoLabel}>Correo electrónico</Text>
+            <Text style={styles.infoValue}>{usuario.correo}</Text>
+            
+            <Text style={styles.infoLabel}>Teléfono</Text>
+            <Text style={styles.infoValue}>{usuario.telefono}</Text>
+          </View>
+
+          <Text style={styles.seccion}>Preferencias</Text>
+
+          <View style={styles.preferenceItem}>
+            <Text style={styles.prefText}>Notificaciones por correo</Text>
+            <View style={styles.switchPlaceholder} />
+          </View>
+
+          <TouchableOpacity style={styles.btnCambiar}>
+            <Text style={styles.btnCambiarText}>Cambiar contraseña</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.btnCerrar} onPress={cerrarSesion}>
+            <Text style={styles.btnCerrarText}>Cerrar sesión</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ImageBackground>
+  );
 }
 
 const { width, height } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
-  background: { 
-    flex: 1, 
-    resizeMode: 'cover' 
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
   },
-  container: { 
-    flex: 1, 
-    justifyContent: 'space-between', 
-    alignItems: 'center' 
+  container: {
+    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  header: { 
-    width: '100%', 
-    alignItems: 'center', 
-    marginTop: height * 0.06 
+  header: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: height * 0.06,
   },
-  logo: { 
-    width: 140, 
-    height: 90, 
-    resizeMode: 'contain', 
-    marginBottom: 10 
+  logo: {
+    width: 140,
+    height: 90,
+    resizeMode: 'contain',
+    marginBottom: 10,
   },
-  profileHeader: { 
-    alignItems: 'center', 
-    marginTop: 10 
+  profileHeader: {
+    alignItems: 'center',
+    marginTop: 10,
   },
-  avatar: { 
-    width: 100, 
-    height: 100, 
-    borderRadius: 50, 
-    borderWidth: 2, 
-    borderColor: '#007b4a', 
-    backgroundColor: '#fff', 
-    marginBottom: 10 
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#007b4a',
+    backgroundColor: '#fff',
+    marginBottom: 10,
   },
-  nombre: { 
-    backgroundColor: '#ffffffcc', 
-    color: '#007b4a', 
-    fontSize: 18, 
-    fontWeight: 'bold', 
-    paddingHorizontal: 25, 
-    paddingVertical: 8, 
-    borderRadius: 15 
+  nombre: {
+    backgroundColor: '#ffffffcc',
+    color: '#007b4a',
+    fontSize: 18,
+    fontWeight: 'bold',
+    paddingHorizontal: 25,
+    paddingVertical: 8,
+    borderRadius: 15,
   },
-  main: { 
-    flex: 1, 
-    alignItems: 'center', 
-    width: '100%' 
+  main: {
+    flex: 1,
+    alignItems: 'center',
+    width: '100%',
+    paddingTop: 20,
   },
-  info: { 
-    fontSize: 15, 
-    color: '#333', 
-    marginVertical: 3, 
-    textAlign: 'left', 
-    width: '85%' 
+  infoContainer: {
+    width: '85%',
+    backgroundColor: '#ffffffcc',
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 20,
   },
-  seccion: { 
-    width: '85%', 
-    fontWeight: 'bold', 
-    fontSize: 16, marginTop: 20, 
-    marginBottom: 10, 
-    color: '#007b4a' 
+  infoLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
   },
-  switchRow: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginBottom: 15, 
-    width: '85%' 
+  infoValue: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
+    marginBottom: 15,
   },
-  prefText: { 
-    marginLeft: 10, 
-    fontSize: 14, 
-    color: '#333' 
+  seccion: {
+    width: '85%',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginTop: 10,
+    marginBottom: 15,
+    color: '#007b4a',
   },
-  btnCambiar: { 
-    marginTop: 10, 
-    marginBottom: 5 
+  preferenceItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '85%',
+    backgroundColor: '#ffffffcc',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
   },
-  btnCambiarText: { 
-    color: '#007b4a', 
-    textDecorationLine: 'underline', 
-    fontSize: 15 
+  prefText: {
+    fontSize: 14,
+    color: '#333',
   },
-  btnCerrar: { 
-    backgroundColor: '#d32f2f', 
-    paddingVertical: 12, paddingHorizontal: 40, 
-    borderRadius: 10, alignItems: 'center', 
-    marginTop: 10 
+  switchPlaceholder: {
+    width: 50,
+    height: 30,
+    backgroundColor: '#00A859',
+    borderRadius: 15,
   },
-  btnCerrarText: { 
-    color: '#fff', 
-    fontWeight: 'bold', 
-    fontSize: 15 
+  btnCambiar: {
+    marginTop: 20,
+    marginBottom: 10,
   },
-  navbar: { 
-    width: width, 
-    height: 65, 
-    resizeMode: 'contain' 
+  btnCambiarText: {
+    color: '#007b4a',
+    textDecorationLine: 'underline',
+    fontSize: 15,
+  },
+  btnCerrar: {
+    backgroundColor: '#d32f2f',
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  btnCerrarText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
 });
