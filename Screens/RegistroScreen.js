@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView } from "react-native";
-import UsuarioService from "../Services/usuarioService";
+
 
 export default function RegistroScreen({ navigation, setUsuarioLogueado }) {
 
