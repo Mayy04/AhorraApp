@@ -122,4 +122,45 @@ const styles = StyleSheet.create({
     marginBottom: 10, 
     color: "#fff" 
   },
+   subtitulo: {
+    fontSize: 16,
+    color: "#fff",
+    marginBottom: 30,
+    textAlign: 'center',
+    opacity: 0.9,
+  },
+  input: { 
+    width: "80%", 
+    backgroundColor: "#fff", 
+    padding: 15, 
+    marginBottom: 15, 
+    borderRadius: 12,
+    fontSize: 16,
+    color: "#333",
+  },
+  boton: { 
+    backgroundColor: "#00D162", 
+    padding: 16, 
+    borderRadius: 12, 
+    width: "80%", 
+    marginTop: 10,
+  },
+  botonDeshabilitado: {
+    backgroundColor: '#cccccc',
+  },
+  botonTexto: { 
+    color: "#fff", 
+    fontWeight: "bold", 
+    textAlign: "center",
+    fontSize: 16,
+  },
+  botonSecundario: {
+    marginTop: 20,
+    padding: 10,
+  },
+  botonSecundarioTexto: {
+    color: "#fff",
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
 });
