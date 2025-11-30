@@ -10,4 +10,13 @@ const[telefono,setTelefono] = useState("");
 const[contraseña,setContraseña] = useState("");
 const[confirmar,setConfirmar] = useState("");
 const[cargando,setCargando] = useState(false);
+
+const usuarioService = new UsuarioService();
+
+ const registrar = async() => {
+  if(contraseña !== confirmar){
+    Alert.alert("error","las contraseñas no coinciden");
+    return;
+  }
+ }
 }
