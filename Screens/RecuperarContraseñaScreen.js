@@ -60,4 +60,53 @@ export default function RecuperarContraseñaScreen() {
       Alert.alert("Verificación exitosa", "Ahora puedes establecer tu nueva contraseña");
     }
   };
+  const reiniciarProceso = () => {
+    setPaso(1);
+    setCorreo('');
+    setTelefono('');
+    setNuevaContrasena('');
+    setConfirmarContrasena('');
+    setUsuarioVerificado(null);
+  };
+  return (
+    <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <View style={styles.content}>
+              <View style={styles.header}>
+                <Image
+                  source={require('../assets/logoAhorra.png')}
+                  style={styles.logo}
+                />
+                <Text style={styles.titulo}>Recuperar Contraseña</Text>
+                <Text style={styles.subtitulo}>
+                  {paso === 1 
+                    ? "Ingresa tus datos para verificar tu identidad"
+                    : "Establece tu nueva contraseña"
+                  }
+                </Text>
+              </View>
+    
+              {/* Indicador de pasos */}
+              <View style={styles.pasosContainer}>
+                <View style={styles.pasos}>
+                  <View style={[styles.paso, paso >= 1 && styles.pasoActivo]}>
+                    <Text style={[styles.pasoNumero, paso >= 1 && styles.pasoNumeroActivo]}>1</Text>
+                    <Text style={[styles.pasoTexto, paso >= 1 && styles.pasoTextoActivo]}>
+                      Verificación
+                    </Text>
+                  </View>
+                  <View style={[styles.lineaPaso, paso >= 2 && styles.lineaPasoActiva]} />
+                  <View style={[styles.paso, paso >= 2 && styles.pasoActivo]}>
+                    <Text style={[styles.pasoNumero, paso >= 2 && styles.pasoNumeroActivo]}>2</Text>
+                    <Text style={[styles.pasoTexto, paso >= 2 && styles.pasoTextoActivo]}>
+                      Nueva Contraseña
+                    </Text>
+                  </View>
+                </View>
+              </View>
+  );
 }
+      
