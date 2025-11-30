@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import UsuarioService from '../Services/usuarioService';
+
 
 export default function RecuperarContraseñaScreen() {
   const navigation = useNavigation();
