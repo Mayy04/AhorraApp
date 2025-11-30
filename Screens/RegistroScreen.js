@@ -103,4 +103,23 @@ const usuarioService = new UsuarioService();
       </View>
     </ScrollView>
   );
+
 }
+const styles = StyleSheet.create({
+   scrollContainer: {
+    flexGrow: 1,
+  },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#009c5bff", 
+    justifyContent: "center", 
+    alignItems: "center",
+    paddingVertical: 40,
+  },
+  titulo: { 
+    fontSize: 32, 
+    fontWeight: "bold", 
+    marginBottom: 10, 
+    color: "#fff" 
+  },
+});
