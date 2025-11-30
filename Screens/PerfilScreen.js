@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, Image, ImageBackground, Switch, StyleSheet, Dimensions, TouchableOpacity, Alert } from 'react-native';
-import MenuScreen from './menuScreen';
+import React from 'react';
+import { View, Text, Image, ImageBackground, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function PerfilScreen({ navigation }) {
   const [notificaciones, setNotificaciones] = useState(true);

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, Image, ImageBackground, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import MenuScreen from './menuScreen';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, ImageBackground, StyleSheet, Dimensions, 
+  TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import TransaccionService from '../Services/TransaccionService';
 
 export default function PrincipalScreen({ navigation }) {
   const [screen, setScreen] = useState('inicio');
