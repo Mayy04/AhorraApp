@@ -1,137 +1,168 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Platform, StyleSheet } from 'react-native';
-import MenuScreen from "./menuScreen";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView } from "react-native";
+import UsuarioService from "../Services/usuarioService";
 
-export default function RegistroScreen() {
-  const [nombre, setNombre] = useState('');
-  const [correo, setCorreo] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [contrasena, setContrasena] = useState('');
-  const [confirmar, setConfirmar] = useState('');
-   const [screen, setScreen]=useState('inicio');
-  
+export default function RegistroScreen({ navigation, setUsuarioLogueado }) {
+  const [nombre, setNombre] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [confirmar, setConfirmar] = useState("");
+  const [cargando, setCargando] = useState(false);
 
-  const mostrarAlerta = () => {
-    if (
-      nombre.trim() === '' ||
-      correo.trim() === '' ||
-      telefono.trim() === '' ||
-      contrasena.trim() === '' ||
-      confirmar.trim() === ''
-    ) {
-      Alert.alert('Error', 'Todos los campos son obligatorios');
-    } else if (contrasena !== confirmar) {
-      Alert.alert('Error', 'Las contraseñas no coinciden');
+  const usuarioService = new UsuarioService();
+
+  const registrar = async () => {
+    if (contrasena !== confirmar) {
+      Alert.alert("Error", "Las contraseñas no coinciden");
+      return;
+    }
+
+    setCargando(true);
+    const resultado = await usuarioService.crearUsuario(nombre, correo, telefono, contrasena);
+    setCargando(false);
+
+    if (resultado.error) {
+      Alert.alert("Error", resultado.error);
     } else {
-      Alert.alert('Registro exitoso', `¡Bienvenido, ${nombre}!`);
+      Alert.alert("Éxito", "¡Cuenta creada exitosamente!", [
+        { 
+          text: "OK", 
+          onPress: () => navigation.navigate('InicioSesion') 
+        }
+      ]);
+      // Limpiar campos
+      setNombre(""); setCorreo(""); setTelefono(""); setContrasena(""); setConfirmar("");
     }
   };
-switch(screen){
-    case 'regresar':
-      return<MenuScreen/>
-    case 'inicio':
-      default:
+
+  const irALogin = () => {
+    navigation.navigate('InicioSesion');
+  };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={()=> setScreen('regresar')}>
-        <Text style={styles.texto}>Registrarse</Text>
-      </TouchableOpacity>
-      
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.titulo}>Crear Cuenta</Text>
+        <Text style={styles.subtitulo}>Comienza tu viaje financiero</Text>
 
-      <Text style={styles.texto2}>Ingresa tu nombre</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre"
-        value={nombre}
-        onChangeText={setNombre}
-      />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Nombre completo" 
+          value={nombre} 
+          onChangeText={setNombre} 
+          placeholderTextColor="#999"
+        />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Correo electrónico" 
+          value={correo} 
+          onChangeText={setCorreo}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholderTextColor="#999"
+        />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Teléfono" 
+          value={telefono} 
+          onChangeText={setTelefono}
+          keyboardType="phone-pad"
+          placeholderTextColor="#999"
+        />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Contraseña" 
+          secureTextEntry 
+          value={contrasena} 
+          onChangeText={setContrasena} 
+          placeholderTextColor="#999"
+        />
+        <TextInput 
+          style={styles.input} 
+          placeholder="Confirmar contraseña" 
+          secureTextEntry 
+          value={confirmar} 
+          onChangeText={setConfirmar} 
+          placeholderTextColor="#999"
+        />
 
-      <Text style={styles.texto2}>Ingresa tu correo electrónico</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Correo electrónico"
-        value={correo}
-        onChangeText={setCorreo}
-        keyboardType="email-address"
-      />
+        <TouchableOpacity 
+          style={[styles.boton, cargando && styles.botonDeshabilitado]} 
+          onPress={registrar}
+          disabled={cargando}
+        >
+          <Text style={styles.botonTexto}>
+            {cargando ? "CREANDO CUENTA..." : "CREAR CUENTA"}
+          </Text>
+        </TouchableOpacity>
 
-      <Text style={styles.texto2}>Ingresa tu número telefónico</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Número telefónico"
-        value={telefono}
-        onChangeText={setTelefono}
-        keyboardType="phone-pad"
-      />
-
-      <Text style={styles.texto2}>Crea una contraseña</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        value={contrasena}
-        onChangeText={setContrasena}
-        secureTextEntry={true}
-      />
-
-      <Text style={styles.texto2}>Confirma tu contraseña</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Confirmar contraseña"
-        value={confirmar}
-        onChangeText={setConfirmar}
-        secureTextEntry={true}
-      />
-
-      <TouchableOpacity style={styles.botones} onPress={mostrarAlerta}>
-        <Text style={styles.textoBoton}>REGISTRARSE</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.botonSecundario} onPress={irALogin}>
+          <Text style={styles.botonSecundarioTexto}>
+            ¿Ya tienes cuenta? Inicia sesión
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
-}
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#009c5bff',
-    justifyContent: 'center',
-    alignItems: 'center',
+  scrollContainer: {
+    flexGrow: 1,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#D9D9D9',
-    padding: 10,
-    marginBottom: 10,
-    width: '60%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
+  container: { 
+    flex: 1, 
+    backgroundColor: "#009c5bff", 
+    justifyContent: "center", 
+    alignItems: "center",
+    paddingVertical: 40,
   },
-  texto: {
-    color: '#000000',
-    fontSize: 30,
-    marginBottom: 30,
-    fontWeight: 'bold',
+  titulo: { 
+    fontSize: 32, 
+    fontWeight: "bold", 
+    marginBottom: 10, 
+    color: "#fff" 
   },
-  texto2: {
-    color: '#000000',
-    fontSize: 20,
-    marginBottom: 10,
-    fontWeight: 'bold',
-  },
-  botones: {
-    backgroundColor: '#00D162',
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 8,
-    marginBottom: 30,
-    marginTop: 10,
-    width: '60%',
-  },
-  textoBoton: {
-    color: '#fff',
+  subtitulo: {
     fontSize: 16,
-    fontWeight: '600',
+    color: "#fff",
+    marginBottom: 30,
     textAlign: 'center',
+    opacity: 0.9,
+  },
+  input: { 
+    width: "80%", 
+    backgroundColor: "#fff", 
+    padding: 15, 
+    marginBottom: 15, 
+    borderRadius: 12,
+    fontSize: 16,
+    color: "#333",
+  },
+  boton: { 
+    backgroundColor: "#00D162", 
+    padding: 16, 
+    borderRadius: 12, 
+    width: "80%", 
+    marginTop: 10,
+  },
+  botonDeshabilitado: {
+    backgroundColor: '#cccccc',
+  },
+  botonTexto: { 
+    color: "#fff", 
+    fontWeight: "bold", 
+    textAlign: "center",
+    fontSize: 16,
+  },
+  botonSecundario: {
+    marginTop: 20,
+    padding: 10,
+  },
+  botonSecundarioTexto: {
+    color: "#fff",
+    fontSize: 14,
+    textDecorationLine: 'underline',
   },
 });

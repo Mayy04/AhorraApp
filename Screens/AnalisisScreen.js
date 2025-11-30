@@ -50,6 +50,7 @@ export default function AnalisisScreen({ route }) {
         
         gastosPorMes[mes] = (gastosPorMes[mes] || 0) + transaccion.monto;
       } else {
+ 
         ingresosPorMes[mes] = (ingresosPorMes[mes] || 0) + transaccion.monto;
       }
     });
