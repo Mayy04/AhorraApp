@@ -72,7 +72,6 @@ export default function PerfilScreen({ route }) {
 }
 
 const { width, height } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   background: {
     flex: 1,
