@@ -20,13 +20,6 @@ export default function TransaccionesScreen({ route }) {
   });
 
   const transaccionService = new TransaccionService();
-
-  // Categorías predefinidas
-  const categorias = {
-    ingreso: ['Sueldo', 'Freelance', 'Inversiones', 'Regalo', 'Otros'],
-    egreso: ['Comida', 'Transporte', 'Entretenimiento', 'Servicios', 'Salud', 'Educación', 'Otros']
-  };
-
   useEffect(() => {
     cargarTransacciones();
   }, [filtro]);
@@ -284,6 +277,142 @@ export default function TransaccionesScreen({ route }) {
       >
         <Ionicons name="add" size={28} color="#fff" />
       </TouchableOpacity>
+
+      {/* Modal para agregar/editar transacción */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {transaccionEditando ? 'Editar Transacción' : 'Nueva Transacción'}
+              </Text>
+              <TouchableOpacity 
+                onPress={() => setModalVisible(false)}
+                style={styles.botonCerrar}
+              >
+                <Ionicons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView 
+              style={styles.modalBody}
+              showsVerticalScrollIndicator={false}
+            >
+              {/* Selector de Tipo */}
+              <View style={styles.tipoContainer}>
+                <Text style={styles.label}>Tipo de transacción</Text>
+                <View style={styles.tipoButtons}>
+                  <TouchableOpacity
+                    style={[
+                      styles.tipoButton, 
+                      form.tipo === 'ingreso' && styles.tipoButtonActive
+                    ]}
+                    onPress={() => setForm({...form, tipo: 'ingreso'})}
+                  >
+                    <Text style={[
+                      styles.tipoButtonText,
+                      form.tipo === 'ingreso' && styles.tipoButtonTextActive
+                    ]}>
+                      Ingreso
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.tipoButton, 
+                      form.tipo === 'egreso' && styles.tipoButtonActive
+                    ]}
+                    onPress={() => setForm({...form, tipo: 'egreso'})}
+                  >
+                    <Text style={[
+                      styles.tipoButtonText,
+                      form.tipo === 'egreso' && styles.tipoButtonTextActive
+                    ]}>
+                      Egreso
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Monto */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Monto *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ej: 100.50"
+                  value={form.monto}
+                  onChangeText={(text) => setForm({...form, monto: text})}
+                  keyboardType="decimal-pad"
+                  placeholderTextColor="#999"
+                />
+              </View>
+
+              {/* Categoría */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Categoría *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder={`Ej: ${form.tipo === 'ingreso' ? 'Sueldo' : 'Comida'}`}
+                  value={form.categoria}
+                  onChangeText={(text) => setForm({...form, categoria: text})}
+                  placeholderTextColor="#999"
+                />
+              </View>
+
+              {/* Descripción */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Descripción (opcional)</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Agrega una descripción..."
+                  value={form.descripcion}
+                  onChangeText={(text) => setForm({...form, descripcion: text})}
+                  multiline
+                  numberOfLines={3}
+                  placeholderTextColor="#999"
+                />
+              </View>
+
+              {/* Fecha */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Fecha *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="YYYY-MM-DD"
+                  value={form.fecha}
+                  onChangeText={(text) => setForm({...form, fecha: text})}
+                  placeholderTextColor="#999"
+                />
+                <Text style={styles.helperText}>
+                  Formato: Año-Mes-Día (Ej: 2024-01-15)
+                </Text>
+              </View>
+
+              {/* Botones de acción */}
+              <View style={styles.modalActions}>
+                <TouchableOpacity 
+                  style={styles.botonCancelar}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.botonCancelarTexto}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.botonGuardar}
+                  onPress={guardarTransaccion}
+                >
+                  <Text style={styles.botonGuardarTexto}>
+                    {transaccionEditando ? 'ACTUALIZAR' : 'GUARDAR'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -451,5 +580,121 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
-  
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '90%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  botonCerrar: {
+    padding: 5,
+  },
+  modalBody: {
+    padding: 20,
+  },
+  tipoContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  tipoButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  tipoButton: {
+    flex: 1,
+    padding: 15,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+  },
+  tipoButtonActive: {
+    backgroundColor: '#00A859',
+    borderColor: '#00A859',
+  },
+  tipoButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+  },
+  tipoButtonTextActive: {
+    color: '#fff',
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    padding: 15,
+    fontSize: 16,
+    backgroundColor: '#f8f9fa',
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 5,
+    fontStyle: 'italic',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  botonCancelar: {
+    flex: 1,
+    padding: 15,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+  },
+  botonCancelarTexto: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+  },
+  botonGuardar: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    backgroundColor: '#00A859',
+  },
+  botonGuardarTexto: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
 });
