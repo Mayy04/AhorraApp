@@ -18,5 +18,20 @@ const usuarioService = new UsuarioService();
     Alert.alert("error","las contraseñas no coinciden");
     return;
   }
- }
-}
+  setCargando(true);
+  const resultado = await usuarioService.crearUsuario(nombre.correo,telefono,contraseña);
+  setCargando (false);
+  if(resultado.error){
+    Alert.alert("Error", resultado.error);
+  }else {
+      Alert.alert("Éxito", "¡Cuenta creada exitosamente!", [
+        { 
+          text: "OK", 
+          onPress: () => navigation.navigate('InicioSesion') 
+        }
+      ]);
+
+      setNombre(""); setCorreo(""); setTelefono(""); setContrasena(""); setConfirmar("");
+    }
+ };
+} 
