@@ -6,14 +6,127 @@ import { Ionicons } from '@expo/vector-icons';
 import TransaccionService from '../Services/TransaccionService';
 
 export default function PrincipalScreen({ navigation }) {
-  const [screen, setScreen] = useState('inicio');
+  const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
-  switch(screen) {
-    case 'regresar':
-      return <MenuScreen />;
-    case 'inicio':
+  const [resumen, setResumen] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [refrescando, setRefrescando] = useState(false);
+  const [transaccionesRecientes, setTransaccionesRecientes] = useState([]);
+
+  const usuario = route.params?.usuario || { id: 1, nombre: 'Usuario' };
+
+  const transaccionService = new TransaccionService();
+
+  useEffect(() => {
+    if (isFocused) {
+      cargarDatos();
+    }
+  }, [isFocused]);
+
+  const cargarDatos = async () => {
+    setCargando(true);
+    try {
+      const [resumenData, recientesData] = await Promise.all([
+        transaccionService.obtenerResumen(usuario.id),
+        transaccionService.obtenerTransaccionesRecientes(usuario.id, 3)
+      ]);   
+      setResumen(resumenData);
+      setTransaccionesRecientes(recientesData);
+    } catch (error) {
+      console.log("Error cargando datos:", error);
+    } finally {
+      setCargando(false);
+      setRefrescando(false);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefrescando(true);
+    cargarDatos();
+  };
+
+  const formatearMoneda = (monto) => {
+    return `$${parseFloat(monto || 0).toFixed(2)}`;
+  };
+
+  const formatearFecha = (fecha) => {
+    const [year, month, day] = fecha.split('-');
+    return `${day}/${month}`;
+  };
+
+  const getIconoAccion = (accion) => {
+    const iconos = {
+      'ingreso': 'add-circle',
+      'egreso': 'remove-circle',
+      'analisis': 'stats-chart',
+      'presupuestos': 'calendar',
+      'metas': 'flag',
+      'perfil': 'person'
+    };
+    return iconos[accion] || 'cube';
+  };
+
+  const accionesRapidas = [
+    {
+      id: 1,
+      nombre: 'Agregar Ingreso',
+      icono: 'add-circle',
+      color: '#00A859',
+      accion: () => navigation.navigate('Transacciones', { 
+        usuario, 
+        accionRapida: 'ingreso' 
+      })
+    },
+    {
+      id: 2,
+      nombre: 'Agregar Gasto',
+      icono: 'remove-circle',
+      color: '#D62C1A',
+      accion: () => navigation.navigate('Transacciones', { 
+        usuario, 
+        accionRapida: 'egreso' 
+      })
+    },
+    {
+      id: 3,
+      nombre: 'Ver Análisis',
+      icono: 'stats-chart',
+      color: '#FFD600',
+      accion: () => navigation.navigate('Análisis', { usuario })
+    },
+    {
+      id: 4,
+      nombre: 'Presupuestos',
+      icono: 'calendar',
+      color: '#9966FF',
+      accion: () => navigation.navigate('Presupuestos', { usuario })
+    }
+  ];
+
+  return (
+    <ImageBackground
+      source={require('../assets/fondo.png')}
+      style={styles.background}
+    >
+      <View style={styles.container}>
+        {/* Encabezado */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={()=> setScreen('regresar')}>
+            <Image
+            source={require('../assets/logoAhorra_2.png')}
+            style={styles.logo}
+          />
+          </TouchableOpacity>
+          
+          <Text style={styles.saludo}>Hola, Usuario</Text>
     default:
 
+          <View style={styles.balanceCard}>
+            <Text style={styles.balanceTitle}>Saldo disponible</Text>
+            <Text style={styles.balanceAmount}>$5,650.00</Text>
+          </View>
+        </View>
       return (
         <ImageBackground
           source={require('../assets/fondo.png')}
@@ -31,12 +144,21 @@ export default function PrincipalScreen({ navigation }) {
               
               <Text style={styles.saludo}>Hola, Usuario</Text>
 
+        {/* Contenido principal */}
+        <View style={styles.main}>
+          <View style={styles.row}>
+            <View style={styles.option}>
+              <Text style={styles.optionText}>Registrar</Text>
               <View style={styles.balanceCard}>
                 <Text style={styles.balanceTitle}>Saldo disponible</Text>
                 <Text style={styles.balanceAmount}>$5,650.00</Text>
               </View>
             </View>
 
+            <View style={styles.option}>
+              <Text style={styles.optionText}>Análisis</Text>
+            </View>
+          </View>
             {/* Contenido principal */}
             <View style={styles.main}>
               <View style={styles.row}>
@@ -48,6 +170,10 @@ export default function PrincipalScreen({ navigation }) {
                   <Text style={styles.optionText}>Registrar</Text>
                 </TouchableOpacity>
 
+          <View style={styles.row}>
+            <View style={styles.option}>
+              <Text style={styles.optionText}>Presupuestos</Text>
+            </View>
                 <TouchableOpacity 
                   style={styles.option}
                   onPress={() => navigation.navigate('Analisis')}
@@ -66,6 +192,8 @@ export default function PrincipalScreen({ navigation }) {
                   <Text style={styles.optionText}>Presupuestos</Text>
                 </TouchableOpacity>
 
+            <View style={styles.option}>
+              <Text style={styles.optionText}>Metas</Text>
                 <TouchableOpacity 
                   style={styles.option}
                   onPress={() => navigation.navigate('Metas')}
@@ -75,16 +203,17 @@ export default function PrincipalScreen({ navigation }) {
                 </TouchableOpacity>
               </View>
             </View>
-
-            {/* Barra inferior */}
-            <Image
-              source={require('../assets/navbar.png')}
-              style={styles.navbar}
-            />
           </View>
-        </ImageBackground>
-      );
-  }
+        </View>
+
+        {/* Barra inferior */}
+        <Image
+          source={require('../assets/navbar.png')}
+          style={styles.navbar}
+        />
+      </View>
+    </ImageBackground>
+  );
 }
 
 const { width, height } = Dimensions.get('window');
