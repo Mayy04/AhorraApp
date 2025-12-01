@@ -161,7 +161,6 @@ export default class TransaccionService {
         } catch (error) {
             console.log("Error eliminando transacción:", error);
             return { error: "Error al eliminar la transacción" };
-
         }
     }
 

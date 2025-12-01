@@ -361,7 +361,6 @@ export default function TransaccionesScreen({ route }) {
                   onChangeText={(text) => setForm({...form, categoria: text})}
                   placeholderTextColor="#999"
                 />
-
               </View>
 
               {/* Descripción */}
