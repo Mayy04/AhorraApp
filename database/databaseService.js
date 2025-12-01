@@ -37,6 +37,37 @@ export default class DatabaseService {
                 );
             `);
 
+            // Tabla de presupuestos
+            await this.db.execAsync(`
+                CREATE TABLE IF NOT EXISTS presupuestos (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    usuario_id INTEGER NOT NULL,
+                    categoria TEXT NOT NULL,
+                    monto REAL NOT NULL,
+                    periodo TEXT NOT NULL DEFAULT 'mensual',
+                    mes TEXT NOT NULL,
+                    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+                );
+            `);
+
+            // Tabla de metas
+            await this.db.execAsync(`
+                CREATE TABLE IF NOT EXISTS metas (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    usuario_id INTEGER NOT NULL,
+                    nombre TEXT NOT NULL,
+                    monto_objetivo REAL NOT NULL,
+                    monto_actual REAL DEFAULT 0,
+                    fecha_objetivo TEXT NOT NULL,
+                    categoria TEXT NOT NULL,
+                    descripcion TEXT,
+                    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    completada BOOLEAN DEFAULT 0,
+                    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+                );
+            `);
+
             console.log("Base de datos lista");
         } catch (error) {
             console.log("Error creando tablas:", error);
@@ -69,6 +100,34 @@ export default class DatabaseService {
         } catch (error) {
             console.log("Error buscando usuario:", error);
             return null;
+        }
+    }
+
+    async buscarUsuarioPorCorreo(correo) {
+        await this.initialize();
+        try {
+            const usuario = await this.db.getFirstAsync(
+                `SELECT * FROM usuarios WHERE correo = ?`,
+                [correo]
+            );
+            return usuario;
+        } catch (error) {
+            console.log("Error buscando usuario por correo:", error);
+            return null;
+        }
+    }
+
+    async actualizarContrasena(correo, nuevaContrasena) {
+        await this.initialize();
+        try {
+            await this.db.runAsync(
+                `UPDATE usuarios SET contrasena = ? WHERE correo = ?`,
+                [nuevaContrasena, correo]
+            );
+            return { ok: true };
+        } catch (error) {
+            console.log("Error actualizando contraseña:", error);
+            return { error: "Error al actualizar la contraseña" };
         }
     }
 
@@ -128,14 +187,12 @@ export default class DatabaseService {
         } catch (error) {
             console.log("Error eliminando transacción:", error);
             return { error: "Error al eliminar" };
-
         }
     }
 
     async getResumenFinanciero(usuario_id) {
         await this.initialize();
         try {
-            // Obtener el mes actual
             const mesActual = new Date().toISOString().substring(0, 7); 
             
             // Ingresos del mes actual
@@ -186,62 +243,162 @@ export default class DatabaseService {
             };
         }
     }
-    // Buscar usuario por correo
-    async buscarUsuarioPorCorreo(correo) {
-        await this.initialize();
-        try {
-            const usuario = await this.db.getFirstAsync(
-                `SELECT * FROM usuarios WHERE correo = ?`,
-                [correo]
-            );
-            return usuario;
-        } catch (error) {
-            console.log("Error buscando usuario por correo:", error);
-            return null;
-        }
-    }
 
-    // Actualizar contraseña por correo
-    async actualizarContrasena(correo, nuevaContrasena) {
+    // PRESUPUESTOS
+    async insertPresupuesto(usuario_id, categoria, monto, periodo, mes) {
         await this.initialize();
         try {
             await this.db.runAsync(
-                `UPDATE usuarios SET contrasena = ? WHERE correo = ?`,
-                [nuevaContrasena, correo]
+                `INSERT INTO presupuestos (usuario_id, categoria, monto, periodo, mes) VALUES (?, ?, ?, ?, ?)`,
+                [usuario_id, categoria, monto, periodo, mes]
             );
             return { ok: true };
         } catch (error) {
-            console.log("Error actualizando contraseña:", error);
-            return { error: "Error al actualizar la contraseña" };
+            console.log("Error insertando presupuesto:", error);
+            return { error: "No se pudo guardar el presupuesto" };
         }
     }
 
-    async crearTablaMetas() {
-    await this.initialize();
+    async getPresupuestosPorUsuario(usuario_id, mes = null) {
+        await this.initialize();
         try {
-            await this.db.execAsync(`
-                CREATE TABLE IF NOT EXISTS metas (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    usuario_id INTEGER NOT NULL,
-                    nombre TEXT NOT NULL,
-                    monto_objetivo REAL NOT NULL,
-                    monto_actual REAL DEFAULT 0,
-                    fecha_objetivo TEXT NOT NULL,
-                    categoria TEXT NOT NULL,
-                    descripcion TEXT,
-                    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    completada BOOLEAN DEFAULT 0,
-                    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-                );
-            `);
-            console.log("Tabla metas lista");
-            } catch (error) {
-                console.log("Error creando tabla metas:", error);
-                }
-     }
+            let query = `SELECT * FROM presupuestos WHERE usuario_id = ?`;
+            const params = [usuario_id];
+            
+            if (mes) {
+                query += ` AND mes = ?`;
+                params.push(mes);
+            }
+            
+            query += ` ORDER BY categoria`;
+            return await this.db.getAllAsync(query, params);
+        } catch (error) {
+            console.log("Error obteniendo presupuestos:", error);
+            return [];
+        }
+    }
 
+    async actualizarPresupuesto(id, categoria, monto, periodo) {
+        await this.initialize();
+        try {
+            await this.db.runAsync(
+                `UPDATE presupuestos SET categoria = ?, monto = ?, periodo = ? WHERE id = ?`,
+                [categoria, monto, periodo, id]
+            );
+            return { ok: true };
+        } catch (error) {
+            console.log("Error actualizando presupuesto:", error);
+            return { error: "Error al actualizar" };
+        }
+    }
+
+    async eliminarPresupuesto(id) {
+        await this.initialize();
+        try {
+            await this.db.runAsync(`DELETE FROM presupuestos WHERE id = ?`, [id]);
+            return { ok: true };
+        } catch (error) {
+            console.log("Error eliminando presupuesto:", error);
+            return { error: "Error al eliminar" };
+        }
+    }
+
+    async getGastosPorCategoria(usuario_id, mes) {
+        await this.initialize();
+        try {
+            const gastos = await this.db.getAllAsync(`
+                SELECT categoria, SUM(monto) as total_gastado
+                FROM transacciones 
+                WHERE usuario_id = ? 
+                AND tipo = 'egreso' 
+                AND strftime('%Y-%m', fecha) = ?
+                GROUP BY categoria
+            `, [usuario_id, mes]);
+            
+            return gastos;
+        } catch (error) {
+            console.log("Error obteniendo gastos por categoría:", error);
+            return [];
+        }
+    }
+
+    // MÉTODOS PARA FILTROS
+    async getTransaccionesFiltradas(usuario_id, filtros = {}) {
+        await this.initialize();
+        try {
+            let query = `SELECT * FROM transacciones WHERE usuario_id = ?`;
+            const params = [usuario_id];
+            
+            // Filtro por tipo
+            if (filtros.tipo && filtros.tipo !== 'todos') {
+                query += ` AND tipo = ?`;
+                params.push(filtros.tipo);
+            }
+            
+            // Filtro por categoría
+            if (filtros.categoria && filtros.categoria !== 'todas') {
+                query += ` AND categoria = ?`;
+                params.push(filtros.categoria);
+            }
+            
+            // Filtro por rango de fechas
+            if (filtros.fechaInicio && filtros.fechaFin) {
+                query += ` AND fecha BETWEEN ? AND ?`;
+                params.push(filtros.fechaInicio, filtros.fechaFin);
+            } else if (filtros.fechaInicio) {
+                query += ` AND fecha >= ?`;
+                params.push(filtros.fechaInicio);
+            } else if (filtros.fechaFin) {
+                query += ` AND fecha <= ?`;
+                params.push(filtros.fechaFin);
+            }
+            
+            // Filtro por descripción (búsqueda)
+            if (filtros.descripcion) {
+                query += ` AND descripcion LIKE ?`;
+                params.push(`%${filtros.descripcion}%`);
+            }
+            
+            // Filtro por monto
+            if (filtros.montoMin !== undefined && filtros.montoMin !== '') {
+                query += ` AND monto >= ?`;
+                params.push(parseFloat(filtros.montoMin));
+            }
+            
+            if (filtros.montoMax !== undefined && filtros.montoMax !== '') {
+                query += ` AND monto <= ?`;
+                params.push(parseFloat(filtros.montoMax));
+            }
+            
+            query += ` ORDER BY fecha DESC, id DESC`;
+            
+            return await this.db.getAllAsync(query, params);
+        } catch (error) {
+            console.log("Error obteniendo transacciones filtradas:", error);
+            return [];
+        }
+    }
+
+    async getCategoriasUnicas(usuario_id) {
+        await this.initialize();
+        try {
+            const categorias = await this.db.getAllAsync(`
+                SELECT DISTINCT categoria 
+                FROM transacciones 
+                WHERE usuario_id = ? 
+                ORDER BY categoria
+            `, [usuario_id]);
+            
+            return categorias.map(item => item.categoria);
+        } catch (error) {
+            console.log("Error obteniendo categorías:", error);
+            return [];
+        }
+    }
+
+    // MÉTODOS PARA METAS
     async insertMeta(usuario_id, nombre, monto_objetivo, monto_actual, fecha_objetivo, categoria, descripcion) {
-        await this.crearTablaMetas();
+        await this.initialize();
         try {
             const completada = monto_actual >= monto_objetivo ? 1 : 0;
             
@@ -258,7 +415,7 @@ export default class DatabaseService {
     }
 
     async getMetasPorUsuario(usuario_id) {
-        await this.crearTablaMetas();
+        await this.initialize();
         try {
             const metas = await this.db.getAllAsync(
                 `SELECT * FROM metas WHERE usuario_id = ? ORDER BY fecha_objetivo ASC`,
@@ -272,7 +429,7 @@ export default class DatabaseService {
     }
 
     async actualizarMeta(id, nombre, monto_objetivo, monto_actual, fecha_objetivo, categoria, descripcion) {
-        await this.crearTablaMetas();
+        await this.initialize();
         try {
             const completada = monto_actual >= monto_objetivo ? 1 : 0;
             
@@ -291,9 +448,8 @@ export default class DatabaseService {
     }
 
     async actualizarMontoMeta(id, nuevoMonto) {
-        await this.crearTablaMetas();
+        await this.initialize();
         try {
-            // Primero obtener la meta actual
             const meta = await this.db.getFirstAsync(
                 `SELECT * FROM metas WHERE id = ?`,
                 [id]
@@ -317,7 +473,7 @@ export default class DatabaseService {
     }
 
     async eliminarMeta(id) {
-        await this.crearTablaMetas();
+        await this.initialize();
         try {
             await this.db.runAsync(`DELETE FROM metas WHERE id = ?`, [id]);
             return { ok: true };
@@ -328,7 +484,7 @@ export default class DatabaseService {
     }
 
     async getEstadisticasMetas(usuario_id) {
-        await this.crearTablaMetas();
+        await this.initialize();
         try {
             const estadisticas = await this.db.getFirstAsync(`
                 SELECT 
@@ -348,136 +504,125 @@ export default class DatabaseService {
         }
     }
 
-    // Nueva tabla para transacciones de metas
-    async crearTablaTransaccionesMeta() {
+    // Método auxiliar para ejecutar consultas
+    async getAllAsync(sql, params = []) {
         await this.initialize();
         try {
-            await this.db.execAsync(`
-                CREATE TABLE IF NOT EXISTS transacciones_meta (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    usuario_id INTEGER NOT NULL,
-                    meta_id INTEGER NOT NULL,
-                    monto REAL NOT NULL,
-                    fecha TEXT NOT NULL,
-                    descripcion TEXT,
-                    tipo TEXT DEFAULT 'ahorro',
-                    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-                    FOREIGN KEY (meta_id) REFERENCES metas(id)
-                );
-            `);
-            console.log("Tabla transacciones_meta lista");
+            return await this.db.getAllAsync(sql, params);
         } catch (error) {
-            console.log("Error creando tabla transacciones_meta:", error);
-        }
-    }
-
-    // Insertar transacción de meta
-    async insertTransaccionMeta(usuario_id, meta_id, monto, fecha, descripcion = '') {
-        await this.crearTablaTransaccionesMeta();
-        try {
-            await this.db.runAsync(
-                `INSERT INTO transacciones_meta (usuario_id, meta_id, monto, fecha, descripcion) 
-                VALUES (?, ?, ?, ?, ?)`,
-                [usuario_id, meta_id, monto, fecha, descripcion]
-            );
-            return { ok: true };
-        } catch (error) {
-            console.log("Error insertando transacción meta:", error);
-            return { error: "No se pudo guardar la transacción de meta" };
-        }
-    }
-
-    // Obtener total ahorrado en metas por usuario
-    async getTotalAhorradoEnMetas(usuario_id) {
-        await this.crearTablaTransaccionesMeta();
-        try {
-            const resultado = await this.db.getFirstAsync(
-                `SELECT COALESCE(SUM(monto), 0) as total FROM transacciones_meta WHERE usuario_id = ?`,
-                [usuario_id]
-            );
-            return resultado?.total || 0;
-        } catch (error) {
-            console.log("Error obteniendo total ahorrado:", error);
-            return 0;
-        }
-    }
-
-    // Obtener categorías únicas de transacciones para presupuestos
-    async getCategoriasDeTransacciones(usuario_id) {
-        await this.initialize();
-        try {
-            const categorias = await this.db.getAllAsync(
-                `SELECT DISTINCT categoria FROM transacciones 
-                WHERE usuario_id = ? AND tipo = 'egreso' 
-                ORDER BY categoria`,
-                [usuario_id]
-            );
-            return categorias.map(cat => cat.categoria);
-        } catch (error) {
-            console.log("Error obteniendo categorías:", error);
+            console.log("Error en getAllAsync:", error);
             return [];
         }
     }
 
-// Actualizar cálculo de resumen financiero para incluir metas
-    async getResumenFinancieroCompleto(usuario_id) {
+    async getFirstAsync(sql, params = []) {
         await this.initialize();
         try {
-            const mesActual = new Date().toISOString().substring(0, 7);
-            
-            // Ingresos del mes
-            const ingresos = await this.db.getFirstAsync(
-                `SELECT SUM(monto) as total FROM transacciones 
-                WHERE usuario_id = ? AND tipo = 'ingreso' 
-                AND strftime('%Y-%m', fecha) = ?`,
-                [usuario_id, mesActual]
-            );
-            
-            // Gastos del mes
-            const egresos = await this.db.getFirstAsync(
-                `SELECT SUM(monto) as total FROM transacciones 
-                WHERE usuario_id = ? AND tipo = 'egreso' 
-                AND strftime('%Y-%m', fecha) = ?`,
-                [usuario_id, mesActual]
-            );
-
-            // Total ahorrado en metas
-            const totalAhorradoMetas = await this.getTotalAhorradoEnMetas(usuario_id);
-            
-            // Saldo total (considerando metas)
-            const saldoTotal = await this.db.getFirstAsync(
-                `SELECT 
-                    (SELECT COALESCE(SUM(monto), 0) FROM transacciones WHERE usuario_id = ? AND tipo = 'ingreso') -
-                    (SELECT COALESCE(SUM(monto), 0) FROM transacciones WHERE usuario_id = ? AND tipo = 'egreso') as saldo
-                `,
-                [usuario_id, usuario_id]
-            );
-
-            const ingresosMes = ingresos?.total || 0;
-            const gastosMes = egresos?.total || 0;
-            const ahorroMes = ingresosMes - gastosMes;
-            const saldoActual = (saldoTotal?.saldo || 0) - totalAhorradoMetas;
-
-            return {
-                saldoActual: saldoActual,
-                ingresosMes: ingresosMes,
-                gastosMes: gastosMes,
-                ahorroMes: ahorroMes,
-                totalAhorradoMetas: totalAhorradoMetas,
-                saldoDisponible: saldoActual, 
-                mesActual: mesActual
-            };
+            return await this.db.getFirstAsync(sql, params);
         } catch (error) {
-            console.log("Error obteniendo resumen completo:", error);
-            return { 
-                saldoActual: 0, 
-                ingresosMes: 0, 
-                gastosMes: 0, 
-                ahorroMes: 0,
-                totalAhorradoMetas: 0,
-                saldoDisponible: 0,
-                mesActual: new Date().toISOString().substring(0, 7)
-            };
+            console.log("Error en getFirstAsync:", error);
+            return null;
+        }
+    }
+
+    async runAsync(sql, params = []) {
+        await this.initialize();
+        try {
+            return await this.db.runAsync(sql, params);
+        } catch (error) {
+            console.log("Error en runAsync:", error);
+            throw error;
+        }
+    }
+    async getTransaccionesPorUsuario(usuario_id, filtro = 'todos') {
+    await this.initialize();
+        try {
+            let query = `SELECT * FROM transacciones WHERE usuario_id = ?`;
+            const params = [usuario_id];
+
+            if (filtro !== 'todos') {
+                query += ` AND tipo = ?`;
+                params.push(filtro);
+            }
+
+            query += ` ORDER BY fecha DESC, id DESC`;
+            return await this.db.getAllAsync(query, params);
+        } catch (error) {
+            console.log("Error obteniendo transacciones:", error);
+            return [];
+        }
+    }
+
+    async getTransaccionesFiltradas(usuario_id, filtros = {}) {
+        await this.initialize();
+        try {
+            let query = `SELECT * FROM transacciones WHERE usuario_id = ?`;
+            const params = [usuario_id];
+            
+            // Filtro por tipo
+            if (filtros.tipo && filtros.tipo !== 'todos') {
+                query += ` AND tipo = ?`;
+                params.push(filtros.tipo);
+            }
+            
+            // Filtro por categoría
+            if (filtros.categoria && filtros.categoria !== 'todas') {
+                query += ` AND categoria = ?`;
+                params.push(filtros.categoria);
+            }
+            
+            // Filtro por rango de fechas
+            if (filtros.fechaInicio && filtros.fechaFin) {
+                query += ` AND fecha BETWEEN ? AND ?`;
+                params.push(filtros.fechaInicio, filtros.fechaFin);
+            } else if (filtros.fechaInicio) {
+                query += ` AND fecha >= ?`;
+                params.push(filtros.fechaInicio);
+            } else if (filtros.fechaFin) {
+                query += ` AND fecha <= ?`;
+                params.push(filtros.fechaFin);
+            }
+            
+            // Filtro por descripción
+            if (filtros.descripcion) {
+                query += ` AND descripcion LIKE ?`;
+                params.push(`%${filtros.descripcion}%`);
+            }
+            
+            // Filtro por monto
+            if (filtros.montoMin !== undefined && filtros.montoMin !== '') {
+                query += ` AND monto >= ?`;
+                params.push(parseFloat(filtros.montoMin));
+            }
+            
+            if (filtros.montoMax !== undefined && filtros.montoMax !== '') {
+                query += ` AND monto <= ?`;
+                params.push(parseFloat(filtros.montoMax));
+            }
+            
+            query += ` ORDER BY fecha DESC, id DESC`;
+            
+            return await this.db.getAllAsync(query, params);
+        } catch (error) {
+            console.log("Error obteniendo transacciones filtradas:", error);
+            return [];
+        }
+    }
+
+    // Transacciones recientes
+    async getTransaccionesRecientes(usuario_id, limite = 10) {
+        await this.initialize();
+        try {
+            const transacciones = await this.db.getAllAsync(`
+                SELECT * FROM transacciones 
+                WHERE usuario_id = ? 
+                ORDER BY id DESC, fecha DESC
+                LIMIT ?
+            `, [usuario_id, limite]);
+            return transacciones;
+        } catch (error) {
+            console.log("Error obteniendo transacciones recientes:", error);
+            return [];
         }
     }
 }

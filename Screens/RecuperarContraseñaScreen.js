@@ -13,35 +13,64 @@ export default function RecuperarContraseñaScreen() {
   const [confirmarContrasena, setConfirmarContrasena] = useState('');
   const [cargando, setCargando] = useState(false);
   const [usuarioVerificado, setUsuarioVerificado] = useState(null);
+  const [errores, setErrores] = useState({});
 
   const usuarioService = new UsuarioService();
 
-  const validarCorreo = () => {
+  // Validaciones
+  const validarCorreo = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(correo);
+    return emailRegex.test(email);
   };
 
-  const validarTelefono = () => {
-    return telefono.length >= 10;
+  const validarTelefono = (phone) => {
+    return phone && phone.replace(/\D/g, '').length >= 10;
   };
 
   const validarContrasenas = () => {
     return nuevaContrasena.length >= 4 && nuevaContrasena === confirmarContrasena;
   };
 
+  const validarPaso1 = () => {
+    const nuevosErrores = {};
+    
+    if (!correo.trim()) {
+      nuevosErrores.correo = "El correo es requerido";
+    } else if (!validarCorreo(correo)) {
+      nuevosErrores.correo = "Correo electrónico no válido";
+    }
+
+    if (!telefono.trim()) {
+      nuevosErrores.telefono = "El teléfono es requerido";
+    } else if (!validarTelefono(telefono)) {
+      nuevosErrores.telefono = "Teléfono debe tener mínimo 10 dígitos";
+    }
+
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
+  };
+
+  const validarPaso2 = () => {
+    const nuevosErrores = {};
+    
+    if (!nuevaContrasena) {
+      nuevosErrores.nuevaContrasena = "La contraseña es requerida";
+    } else if (nuevaContrasena.length < 4) {
+      nuevosErrores.nuevaContrasena = "Mínimo 4 caracteres";
+    }
+
+    if (!confirmarContrasena) {
+      nuevosErrores.confirmarContrasena = "Confirma tu contraseña";
+    } else if (nuevaContrasena !== confirmarContrasena) {
+      nuevosErrores.confirmarContrasena = "Las contraseñas no coinciden";
+    }
+
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
+  };
+
   const verificarUsuario = async () => {
-    if (!correo || !telefono) {
-      Alert.alert("Error", "Por favor completa todos los campos");
-      return;
-    }
-
-    if (!validarCorreo()) {
-      Alert.alert("Error", "Por favor ingresa un correo electrónico válido");
-      return;
-    }
-
-    if (!validarTelefono()) {
-      Alert.alert("Error", "El teléfono debe tener al menos 10 dígitos");
+    if (!validarPaso1()) {
       return;
     }
 
@@ -54,25 +83,14 @@ export default function RecuperarContraseñaScreen() {
     } else {
       setUsuarioVerificado(resultado.usuario);
       setPaso(2);
+      setErrores({});
       Alert.alert("Verificación exitosa", "Ahora puedes establecer tu nueva contraseña");
     }
   };
 
   const cambiarContrasena = async () => {
-    if (!nuevaContrasena || !confirmarContrasena) {
-      Alert.alert("Error", "Por favor completa todos los campos");
+    if (!validarPaso2()) {
       return;
-    }
-
-    if (!validarContrasenas()) {
-      if (nuevaContrasena.length < 4) {
-        Alert.alert("Error", "La contraseña debe tener al menos 4 caracteres");
-        return;
-      }
-      if (nuevaContrasena !== confirmarContrasena) {
-        Alert.alert("Error", "Las contraseñas no coinciden");
-        return;
-      }
     }
 
     setCargando(true);
@@ -106,6 +124,7 @@ export default function RecuperarContraseñaScreen() {
     setNuevaContrasena('');
     setConfirmarContrasena('');
     setUsuarioVerificado(null);
+    setErrores({});
   };
 
   return (
@@ -156,16 +175,25 @@ export default function RecuperarContraseñaScreen() {
                   <Ionicons name="mail-outline" size={16} color="#007b4a" /> Correo electrónico
                 </Text>
                 <TextInput
-                  style={[styles.input, correo && validarCorreo() && styles.inputValido]}
+                  style={[
+                    styles.input, 
+                    correo && validarCorreo(correo) && styles.inputValido,
+                    errores.correo && styles.inputError
+                  ]}
                   placeholder="tu@correo.com"
                   value={correo}
-                  onChangeText={setCorreo}
+                  onChangeText={(text) => {
+                    setCorreo(text);
+                    if (errores.correo) {
+                      setErrores(prev => ({...prev, correo: null}));
+                    }
+                  }}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   placeholderTextColor="#999"
                 />
-                {correo && !validarCorreo() && (
-                  <Text style={styles.errorText}>Correo electrónico no válido</Text>
+                {errores.correo && (
+                  <Text style={styles.errorText}>{errores.correo}</Text>
                 )}
               </View>
 
@@ -174,25 +202,34 @@ export default function RecuperarContraseñaScreen() {
                   <Ionicons name="call-outline" size={16} color="#007b4a" /> Teléfono
                 </Text>
                 <TextInput
-                  style={[styles.input, telefono && validarTelefono() && styles.inputValido]}
+                  style={[
+                    styles.input, 
+                    telefono && validarTelefono(telefono) && styles.inputValido,
+                    errores.telefono && styles.inputError
+                  ]}
                   placeholder="1234567890"
                   value={telefono}
-                  onChangeText={setTelefono}
+                  onChangeText={(text) => {
+                    setTelefono(text);
+                    if (errores.telefono) {
+                      setErrores(prev => ({...prev, telefono: null}));
+                    }
+                  }}
                   keyboardType="phone-pad"
                   placeholderTextColor="#999"
                 />
-                {telefono && !validarTelefono() && (
-                  <Text style={styles.errorText}>Mínimo 10 dígitos</Text>
+                {errores.telefono && (
+                  <Text style={styles.errorText}>{errores.telefono}</Text>
                 )}
               </View>
 
               <TouchableOpacity
                 style={[
                   styles.botonPrincipal,
-                  (!validarCorreo() || !validarTelefono() || cargando) && styles.botonDeshabilitado
+                  (!validarCorreo(correo) || !validarTelefono(telefono) || cargando) && styles.botonDeshabilitado
                 ]}
                 onPress={verificarUsuario}
-                disabled={!validarCorreo() || !validarTelefono() || cargando}
+                disabled={!validarCorreo(correo) || !validarTelefono(telefono) || cargando}
               >
                 <Text style={styles.botonPrincipalTexto}>
                   {cargando ? 'VERIFICANDO...' : 'VERIFICAR IDENTIDAD'}
@@ -228,16 +265,22 @@ export default function RecuperarContraseñaScreen() {
                 <TextInput
                   style={[
                     styles.input,
-                    nuevaContrasena && nuevaContrasena.length >= 4 && styles.inputValido
+                    nuevaContrasena && nuevaContrasena.length >= 4 && styles.inputValido,
+                    errores.nuevaContrasena && styles.inputError
                   ]}
                   placeholder="Mínimo 4 caracteres"
                   value={nuevaContrasena}
-                  onChangeText={setNuevaContrasena}
+                  onChangeText={(text) => {
+                    setNuevaContrasena(text);
+                    if (errores.nuevaContrasena) {
+                      setErrores(prev => ({...prev, nuevaContrasena: null}));
+                    }
+                  }}
                   secureTextEntry
                   placeholderTextColor="#999"
                 />
-                {nuevaContrasena && nuevaContrasena.length < 4 && (
-                  <Text style={styles.errorText}>Mínimo 4 caracteres</Text>
+                {errores.nuevaContrasena && (
+                  <Text style={styles.errorText}>{errores.nuevaContrasena}</Text>
                 )}
               </View>
 
@@ -249,19 +292,25 @@ export default function RecuperarContraseñaScreen() {
                   style={[
                     styles.input,
                     confirmarContrasena && nuevaContrasena === confirmarContrasena && styles.inputValido,
-                    confirmarContrasena && nuevaContrasena !== confirmarContrasena && styles.inputError
+                    (confirmarContrasena && nuevaContrasena !== confirmarContrasena) && styles.inputError,
+                    errores.confirmarContrasena && styles.inputError
                   ]}
                   placeholder="Repite tu contraseña"
                   value={confirmarContrasena}
-                  onChangeText={setConfirmarContrasena}
+                  onChangeText={(text) => {
+                    setConfirmarContrasena(text);
+                    if (errores.confirmarContrasena) {
+                      setErrores(prev => ({...prev, confirmarContrasena: null}));
+                    }
+                  }}
                   secureTextEntry
                   placeholderTextColor="#999"
                 />
-                {confirmarContrasena && nuevaContrasena !== confirmarContrasena && (
-                  <Text style={styles.errorText}>Las contraseñas no coinciden</Text>
+                {errores.confirmarContrasena && (
+                  <Text style={styles.errorText}>{errores.confirmarContrasena}</Text>
                 )}
                 {confirmarContrasena && nuevaContrasena === confirmarContrasena && (
-                  <Text style={styles.successText}>✓ Las contraseñas coinciden</Text>
+                  <Text style={styles.successText}>Las contraseñas coinciden</Text>
                 )}
               </View>
 

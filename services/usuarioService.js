@@ -9,7 +9,7 @@ export default class UsuarioService {
         if (!nombre || nombre.length < 3) {
             return { error: "El nombre debe tener al menos 3 caracteres" };
         }
-        if (!correo || !correo.includes('@')) {
+        if (!correo || !this.validarCorreo(correo)) {
             return { error: "Correo electrónico no válido" };
         }
         if (!telefono || telefono.length < 10) {
@@ -33,5 +33,45 @@ export default class UsuarioService {
         }
 
         return { ok: true, usuario };
+    }
+
+    // Recuperación de contraseña
+    async validarCredencialesRecuperacion(correo, telefono) {
+        if (!correo || !telefono) {
+            return { error: "Correo y teléfono son requeridos" };
+        }
+
+        const usuario = await this.db.buscarUsuarioPorCorreo(correo);
+        if (!usuario) {
+            return { error: "No existe una cuenta con este correo" };
+        }
+
+        if (usuario.telefono !== telefono) {
+            return { error: "El teléfono no coincide con los registros" };
+        }
+
+        return { ok: true, usuario };
+    }
+
+    async actualizarContrasena(correo, nuevaContrasena) {
+        if (!correo || !nuevaContrasena) {
+            return { error: "Todos los campos son requeridos" };
+        }
+
+        if (nuevaContrasena.length < 4) {
+            return { error: "La contraseña debe tener mínimo 4 caracteres" };
+        }
+
+        return await this.db.actualizarContrasena(correo, nuevaContrasena);
+    }
+
+    // Validación de correo
+    validarCorreo(correo) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(correo);
+    }
+
+    validarTelefono(telefono) {
+        return telefono && telefono.replace(/\D/g, '').length >= 10;
     }
 }
