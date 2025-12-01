@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {View, Text, StyleSheet, Image, ImageBackground, Dimensions, ScrollView, ActivityIndicator} from "react-native";
 import { useIsFocused } from '@react-navigation/native';
 import { PieChart, BarChart } from "react-native-chart-kit";
-import TransaccionService from "../services/TransaccionService";
+import TransaccionService from "../Services/TransaccionService";
 
 const { width, height } = Dimensions.get("window");
 
@@ -47,6 +47,7 @@ export default function AnalisisScreen({ route }) {
 
   const procesarDatos = (transacciones) => {
     const gastosPorCategoria = {};
+    const ingresosPorCategoria = {};
     const ingresosPorMes = {};
     const gastosPorMes = {};
 
@@ -74,6 +75,10 @@ export default function AnalisisScreen({ route }) {
           gastosPorMes[mes] = (gastosPorMes[mes] || 0) + transaccion.monto;
         }
       } else {
+        // Ingresos por categoría
+        ingresosPorCategoria[transaccion.categoria] = 
+          (ingresosPorCategoria[transaccion.categoria] || 0) + transaccion.monto;
+        
         // Ingresos por mes (últimos 6 meses)
         if (ultimos6Meses.includes(mes)) {
           ingresosPorMes[mes] = (ingresosPorMes[mes] || 0) + transaccion.monto;
@@ -81,19 +86,37 @@ export default function AnalisisScreen({ route }) {
       }
     });
 
-    // Datos para gráfica de categorías
-    const datosCategorias = Object.entries(gastosPorCategoria)
+    // Encontrar el valor máximo 
+    let maxValor = 0;
+    ultimos6Meses.forEach(mes => {
+      maxValor = Math.max(maxValor, ingresosPorMes[mes] || 0, gastosPorMes[mes] || 0);
+    });
+
+    // Preparar datos para gráfica de pastel de ingresos
+    const datosIngresosCategoria = Object.entries(ingresosPorCategoria)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 6)
       .map(([categoria, monto], index) => ({
         name: categoria.length > 10 ? categoria.substring(0, 10) + '...' : categoria,
         amount: monto,
-        color: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'][index],
+        color: ['#00A859', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'][index],
         legendFontColor: '#7F7F7F',
         legendFontSize: 12,
       }));
 
-    // Preparar datos para gráfica de tendencias
+    // Datos para gráfica de pastel de egresos
+    const datosEgresosCategoria = Object.entries(gastosPorCategoria)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([categoria, monto], index) => ({
+        name: categoria.length > 10 ? categoria.substring(0, 10) + '...' : categoria,
+        amount: monto,
+        color: ['#D62C1A', '#FF6384', '#FFD600', '#C9CBCF', '#8B5CF6', '#10B981'][index],
+        legendFontColor: '#7F7F7F',
+        legendFontSize: 12,
+      }));
+
+    // Datos para gráfica de barras
     const datosTendencias = {
       labels: ultimos6Meses.map(mes => {
         const [year, month] = mes.split('-');
@@ -103,19 +126,25 @@ export default function AnalisisScreen({ route }) {
         {
           data: ultimos6Meses.map(mes => ingresosPorMes[mes] || 0),
           color: (opacity = 1) => `rgba(0, 168, 89, ${opacity})`,
+          strokeWidth: 2,
         },
         {
           data: ultimos6Meses.map(mes => gastosPorMes[mes] || 0),
           color: (opacity = 1) => `rgba(214, 44, 26, ${opacity})`,
+          strokeWidth: 2,
         }
       ]
     };
 
     setDatos({
-      categorias: datosCategorias,
+      ingresosCategoria: datosIngresosCategoria,
+      egresosCategoria: datosEgresosCategoria,
       tendencias: datosTendencias,
       totalGastos: Object.values(gastosPorCategoria).reduce((sum, val) => sum + val, 0),
-      totalIngresos: Object.values(ingresosPorMes).reduce((sum, val) => sum + val, 0)
+      totalIngresos: Object.values(ingresosPorCategoria).reduce((sum, val) => sum + val, 0),
+      totalGastosMes: Object.values(gastosPorMes).reduce((sum, val) => sum + val, 0),
+      totalIngresosMes: Object.values(ingresosPorMes).reduce((sum, val) => sum + val, 0),
+      maxValor: maxValor 
     });
   };
 
@@ -156,48 +185,39 @@ export default function AnalisisScreen({ route }) {
             </View>
             <View style={styles.resumenCard}>
               <Text style={[styles.resumenValor, styles.ingreso]}>+${resumen?.ingresosMes?.toFixed(2) || '0.00'}</Text>
-              <Text style={styles.resumenLabel}>Ingresos</Text>
+              <Text style={styles.resumenLabel}>Ingresos Mes</Text>
             </View>
             <View style={styles.resumenCard}>
               <Text style={[styles.resumenValor, styles.egreso]}>-${resumen?.gastosMes?.toFixed(2) || '0.00'}</Text>
-              <Text style={styles.resumenLabel}>Gastos</Text>
+              <Text style={styles.resumenLabel}>Gastos Mes</Text>
             </View>
             <View style={styles.resumenCard}>
               <Text style={[styles.resumenValor, styles.ahorro]}>${resumen?.ahorroMes?.toFixed(2) || '0.00'}</Text>
-              <Text style={styles.resumenLabel}>Ahorro</Text>
+              <Text style={styles.resumenLabel}>Ahorro Mes</Text>
             </View>
           </View>
         </View>
 
-        {/* Gráfica de Gastos por Categoría */}
-        {datos?.categorias.length > 0 && (
-          <View style={styles.graficaContainer}>
-            <Text style={styles.seccionTitulo}>Gastos por Categoría</Text>
-            <PieChart
-              data={datos.categorias}
-              width={width * 0.9}
-              height={200}
-              chartConfig={chartConfig}
-              accessor="amount"
-              backgroundColor="transparent"
-              paddingLeft="15"
-              absolute
-            />
-          </View>
-        )}
-
-        {/* Gráfica de Tendencias */}
+        {/* Gráfica de Barras - Ingresos vs Egresos */}
         {datos?.tendencias && (
           <View style={styles.graficaContainer}>
-            <Text style={styles.seccionTitulo}>Tendencias Mensuales</Text>
+            <Text style={styles.seccionTitulo}>Ingresos vs Egresos</Text>
             <Text style={styles.graficaSubtitulo}>Últimos 6 meses</Text>
             <BarChart
               data={datos.tendencias}
               width={width * 0.9}
               height={220}
-              chartConfig={chartConfigBar}
+              chartConfig={{
+                ...chartConfigBar,
+                // Configuración para mostrar las barras proporcionalmente
+                barPercentage: 0.4,
+              }}
               style={styles.grafica}
               showValuesOnTopOfBars
+              fromZero
+              yAxisLabel="$"
+              yAxisSuffix=""
+              segments={5}
             />
             <View style={styles.leyenda}>
               <View style={styles.leyendaItem}>
@@ -206,8 +226,54 @@ export default function AnalisisScreen({ route }) {
               </View>
               <View style={styles.leyendaItem}>
                 <View style={[styles.leyendaColor, {backgroundColor: '#D62C1A'}]} />
-                <Text style={styles.leyendaTexto}>Gastos</Text>
+                <Text style={styles.leyendaTexto}>Egresos</Text>
               </View>
+            </View>
+          </View>
+        )}
+
+        {/* Gráfica de Pastel - Distribución de Ingresos */}
+        {datos?.ingresosCategoria.length > 0 && (
+          <View style={styles.graficaContainer}>
+            <Text style={styles.seccionTitulo}>Distribución de Ingresos</Text>
+            <Text style={styles.graficaSubtitulo}>Por categoría</Text>
+            <PieChart
+              data={datos.ingresosCategoria}
+              width={width * 0.9}
+              height={200}
+              chartConfig={chartConfig}
+              accessor="amount"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              absolute
+            />
+            <View style={styles.datosAdicionales}>
+              <Text style={styles.datoTexto}>
+                Total Ingresos: ${datos.totalIngresos.toFixed(2)}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* Gráfica de Pastel - Distribución de Egresos */}
+        {datos?.egresosCategoria.length > 0 && (
+          <View style={styles.graficaContainer}>
+            <Text style={styles.seccionTitulo}>Distribución de Egresos</Text>
+            <Text style={styles.graficaSubtitulo}>Por categoría</Text>
+            <PieChart
+              data={datos.egresosCategoria}
+              width={width * 0.9}
+              height={200}
+              chartConfig={chartConfig}
+              accessor="amount"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              absolute
+            />
+            <View style={styles.datosAdicionales}>
+              <Text style={styles.datoTexto}>
+                Total Egresos: ${datos.totalGastos.toFixed(2)}
+              </Text>
             </View>
           </View>
         )}
@@ -215,27 +281,35 @@ export default function AnalisisScreen({ route }) {
         {/* Estadísticas Generales */}
         {datos && (
           <View style={styles.estadisticasContainer}>
-            <Text style={styles.seccionTitulo}>Estadísticas</Text>
+            <Text style={styles.seccionTitulo}>Estadísticas Generales</Text>
             <View style={styles.estadisticasGrid}>
               <View style={styles.estadisticaItem}>
-                <Text style={styles.estadisticaValor}>${datos.totalIngresos.toFixed(2)}</Text>
+                <Text style={[styles.estadisticaValor, styles.ingreso]}>${datos.totalIngresos.toFixed(2)}</Text>
                 <Text style={styles.estadisticaLabel}>Total Ingresos</Text>
               </View>
               <View style={styles.estadisticaItem}>
-                <Text style={styles.estadisticaValor}>${datos.totalGastos.toFixed(2)}</Text>
-                <Text style={styles.estadisticaLabel}>Total Gastos</Text>
+                <Text style={[styles.estadisticaValor, styles.egreso]}>${datos.totalGastos.toFixed(2)}</Text>
+                <Text style={styles.estadisticaLabel}>Total Egresos</Text>
               </View>
               <View style={styles.estadisticaItem}>
+                <Text style={[styles.estadisticaValor, styles.ahorro]}>
+                  ${(datos.totalIngresos - datos.totalGastos).toFixed(2)}
+                </Text>
+                <Text style={styles.estadisticaLabel}>Balance Total</Text>
+              </View>
+            </View>
+            <View style={styles.estadisticasRow}>
+              <View style={styles.estadisticaFull}>
                 <Text style={styles.estadisticaValor}>
                   {datos.totalIngresos > 0 ? ((datos.totalGastos / datos.totalIngresos) * 100).toFixed(1) : '0'}%
                 </Text>
-                <Text style={styles.estadisticaLabel}>% Gastos/Ingresos</Text>
+                <Text style={styles.estadisticaLabel}>Porcentaje Gastos/Ingresos</Text>
               </View>
             </View>
           </View>
         )}
 
-        {(!datos?.categorias.length && !datos?.tendencias) && (
+        {(!datos?.ingresosCategoria.length && !datos?.egresosCategoria.length && !datos?.tendencias) && (
           <View style={styles.sinDatosContainer}>
             <Text style={styles.sinDatosText}>No hay datos para mostrar</Text>
             <Text style={styles.sinDatosSubtext}>Agrega transacciones para ver análisis</Text>
@@ -278,7 +352,9 @@ const chartConfigBar = {
   propsForBackgroundLines: {
     strokeWidth: 1,
     stroke: '#e3e3e3'
-  }
+  },
+  fillShadowGradient: '#00A859',
+  fillShadowGradientOpacity: 1,
 };
 
 const styles = StyleSheet.create({
@@ -333,6 +409,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center'
   },
+  graficaSubtitulo: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 10,
+    textAlign: 'center'
+  },
   resumenGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -375,12 +457,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     alignItems: 'center'
   },
-  graficaSubtitulo: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 10,
-    textAlign: 'center'
-  },
   grafica: {
     marginVertical: 8,
     borderRadius: 16,
@@ -405,6 +481,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666'
   },
+  datosAdicionales: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+  },
+  datoTexto: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+  },
   estadisticasContainer: {
     backgroundColor: '#f8f9fa',
     marginHorizontal: 15,
@@ -415,9 +504,18 @@ const styles = StyleSheet.create({
   estadisticasGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  estadisticasRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   estadisticaItem: {
     flex: 1,
+    alignItems: 'center',
+    padding: 10,
+  },
+  estadisticaFull: {
     alignItems: 'center',
     padding: 10,
   },
