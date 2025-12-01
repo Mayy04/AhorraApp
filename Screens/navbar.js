@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-=======
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
->>>>>>> 643d65511286a68183fcb8c37ab4f1872707091b
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PrincipalScreen from "./PrincipalScreen";
@@ -14,10 +10,6 @@ import MetasScreen from "./MetasScreen";
 
 const Tab = createBottomTabNavigator();
 
-<<<<<<< HEAD
-export default function Navbar({ usuario }) {
-    const insets = useSafeAreaInsets();
-=======
 export default function Navbar({ usuario }){
     const insets = useSafeAreaInsets();
     
@@ -25,7 +17,6 @@ export default function Navbar({ usuario }){
     const screenOptions = {
         usuario: usuario
     };
->>>>>>> 643d65511286a68183fcb8c37ab4f1872707091b
 
     return (
         <Tab.Navigator
@@ -33,15 +24,6 @@ export default function Navbar({ usuario }){
             screenOptions={({ route }) => ({
                 headerShown: false,
                 tabBarShowLabel: true,
-<<<<<<< HEAD
-                tabBarIcon: ({ color, size }) => {
-                    let iconName;
-                    if (route.name === 'Principal') iconName = 'home';
-                    else if (route.name === 'Transacciones') iconName = 'swap-horizontal-sharp';
-                    else if (route.name === 'Perfil') iconName = 'person';
-                    else if (route.name === 'Presupuestos') iconName = 'calendar';
-
-=======
                 tabBarIcon: ({ color, size, focused }) => {
                     let iconName;
                     if (route.name === 'Principal') {
@@ -57,7 +39,6 @@ export default function Navbar({ usuario }){
                     } else if (route.name === 'Metas') {
                         iconName = focused ? 'flag' : 'flag-outline';
                     }
->>>>>>> 643d65511286a68183fcb8c37ab4f1872707091b
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
                 tabBarActiveTintColor: '#128354',
@@ -65,18 +46,6 @@ export default function Navbar({ usuario }){
                 tabBarStyle: {
                     paddingBottom: insets.bottom,
                     height: 60 + insets.bottom,
-<<<<<<< HEAD
-                },
-            })}
-        >
-            <Tab.Screen name="Principal" component={PrincipalScreen} initialParams={{ usuario }} />
-            <Tab.Screen name="Transacciones" component={TransaccionesScreen} initialParams={{ usuario }} />
-            <Tab.Screen name="Presupuestos" component={PresupuestosScreen} initialParams={{ usuario }} />
-            <Tab.Screen name="Perfil" component={PerfilScreen} initialParams={{ usuario }} />
-        </Tab.Navigator>
-    );
-}
-=======
                     backgroundColor: '#ffffff',
                     borderTopWidth: 1,
                     borderTopColor: '#e0e0e0',
@@ -128,4 +97,3 @@ export default function Navbar({ usuario }){
         </Tab.Navigator>
     );
 }
->>>>>>> 643d65511286a68183fcb8c37ab4f1872707091b

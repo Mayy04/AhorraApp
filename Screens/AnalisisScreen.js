@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {View, Text, StyleSheet, Image, ImageBackground, Dimensions, ScrollView, ActivityIndicator} from "react-native";
 import { useIsFocused } from '@react-navigation/native';
 import { PieChart, BarChart } from "react-native-chart-kit";
-import TransaccionService from "../Services/TransaccionService";
+import TransaccionService from "../services/TransaccionService";
 
 const { width, height } = Dimensions.get("window");
 
