@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
-import {
-  View, Text, TextInput, TouchableOpacity, Alert, StyleSheet,
-  ScrollView, Image, KeyboardAvoidingView, Platform
-} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView, Image, KeyboardAvoidingView, Platform} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
+import UsuarioService from '../Services/usuarioService';
 
 export default function RecuperarContraseñaScreen() {
   const navigation = useNavigation();
@@ -264,7 +261,7 @@ export default function RecuperarContraseñaScreen() {
                   <Text style={styles.errorText}>Las contraseñas no coinciden</Text>
                 )}
                 {confirmarContrasena && nuevaContrasena === confirmarContrasena && (
-                  <Text style={styles.successText}>Las contraseñas coinciden</Text>
+                  <Text style={styles.successText}>✓ Las contraseñas coinciden</Text>
                 )}
               </View>
 
@@ -324,6 +321,7 @@ export default function RecuperarContraseñaScreen() {
     </KeyboardAvoidingView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

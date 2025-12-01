@@ -7,7 +7,6 @@ import RecuperarContraseñaScreen from './RecuperarContraseñaScreen.js';
 import PrincipalScreen from './PrincipalScreen.js';
 import MetasScreen from './MetasScreen.js';
 import PresupuestosScreen from './PresupuestosScreen.js'
-
 import AnalisisScreen from './AnalisisScreen.js';
 import PerfilScreen from  './PerfilScreen.js'
 import TransaccionesScreen from './TransaccionesScreen.js'
