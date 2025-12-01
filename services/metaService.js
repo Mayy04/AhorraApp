@@ -1,5 +1,5 @@
-// services/MetaService.js
-import DatabaseService from '../database/databaseService';
+
+import DatabaseService from '../database/DatabaseService';
 
 export default class MetaService {
     constructor() {
@@ -132,11 +132,11 @@ export default class MetaService {
         }
     }
 
-    async agregarAhorro(id, monto) {
-        console.log("Agregando ahorro a meta ID:", id, "Monto:", monto);
+    async agregarAhorro(id, monto, usuario_id) {
+        console.log("Agregando ahorro a meta ID:", id, "Monto:", monto, "Usuario:", usuario_id);
         
-        if (!id || !monto) {
-            return { error: "ID y monto son requeridos" };
+        if (!id || !monto || !usuario_id) {
+            return { error: "ID, monto y usuario_id son requeridos" };
         }
 
         const montoNum = parseFloat(monto);
@@ -146,20 +146,39 @@ export default class MetaService {
 
         try {
             // Obtener meta actual
-            const metas = await this.db.getMetasPorUsuario(1); // Temporal, necesitamos usuario_id
+            const metas = await this.db.getMetasPorUsuario(usuario_id);
             const meta = metas.find(m => m.id === id);
             
             if (!meta) {
                 return { error: "Meta no encontrada" };
             }
 
+            // Verificar si hay saldo suficiente
+            const transaccionService = new (await import('./TransaccionService')).default();
+            const resumen = await transaccionService.obtenerResumen(usuario_id);
+            
+            if (resumen.saldoActual < montoNum) {
+                return { error: "Saldo insuficiente para agregar a la meta" };
+            }
+
             const nuevoMonto = meta.monto_actual + montoNum;
             
+            // Actualizar monto en la meta
             const resultado = await this.db.actualizarMontoMeta(id, nuevoMonto);
             
             if (resultado.error) {
                 return resultado;
             }
+
+            // Crear transacción de egreso para el ahorro
+            await transaccionService.crearTransaccion(
+                usuario_id,
+                'egreso',
+                montoNum,
+                'Ahorro para meta: ' + meta.nombre,
+                `Ahorro agregado a meta: ${meta.nombre}`,
+                new Date().toISOString().split('T')[0]
+            );
             
             return { 
                 ok: true, 
@@ -231,44 +250,5 @@ export default class MetaService {
         const objetivo = new Date(fechaObjetivo);
         const diferencia = objetivo.getTime() - hoy.getTime();
         return Math.ceil(diferencia / (1000 * 3600 * 24));
-    }
-
-    // Método para migrar metas existentes a la base de datos
-    async migrarMetasEjemplo(usuario_id) {
-        const metasEjemplo = [
-            {
-                nombre: 'Viaje a la playa',
-                monto_objetivo: 10000,
-                monto_actual: 3500,
-                fecha_objetivo: '2024-06-01',
-                categoria: 'Viajes',
-                descripcion: 'Ahorrar para vacaciones en la playa'
-            },
-            {
-                nombre: 'Laptop nueva',
-                monto_objetivo: 15000,
-                monto_actual: 8000,
-                fecha_objetivo: '2024-03-15',
-                categoria: 'Tecnología',
-                descripcion: 'Comprar nueva laptop para trabajo'
-            }
-        ];
-
-        try {
-            for (const meta of metasEjemplo) {
-                await this.crearMeta(
-                    usuario_id,
-                    meta.nombre,
-                    meta.monto_objetivo,
-                    meta.monto_actual,
-                    meta.fecha_objetivo,
-                    meta.categoria,
-                    meta.descripcion
-                );
-            }
-            console.log("Metas de ejemplo migradas a la base de datos");
-        } catch (error) {
-            console.log("Error migrando metas de ejemplo:", error);
-        }
     }
 }

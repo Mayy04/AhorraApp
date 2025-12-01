@@ -126,7 +126,8 @@ export default function MetasScreen({ route }) {
       } else {
         setModalVisible(false);
         limpiarForm();
-        await cargarMetas(); // Recargar datos desde la base de datos
+        // Recargar datos desde la base de datos
+        await cargarMetas(); 
         Alert.alert("Éxito", resultado.mensaje);
       }
     } catch (error) {
@@ -147,7 +148,8 @@ export default function MetasScreen({ route }) {
       if (resultado.error) {
         Alert.alert("Error", resultado.error);
       } else {
-        await cargarMetas(); // Recargar datos desde la base de datos
+         // Recargar datos desde la base de datos
+        await cargarMetas();
         Alert.alert("Éxito", resultado.mensaje);
       }
     } catch (error) {
@@ -171,7 +173,8 @@ export default function MetasScreen({ route }) {
               if (resultado.error) {
                 Alert.alert("Error", resultado.error);
               } else {
-                await cargarMetas(); // Recargar datos desde la base de datos
+                // Recargar datos desde la base de datos
+                await cargarMetas(); 
                 Alert.alert("Éxito", resultado.mensaje);
               }
             } catch (error) {

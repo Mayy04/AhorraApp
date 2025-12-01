@@ -36,7 +36,7 @@ export default class DatabaseService {
                     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
                 );
             `);
-
+ 
             // Tabla de presupuestos
             await this.db.execAsync(`
                 CREATE TABLE IF NOT EXISTS presupuestos (
