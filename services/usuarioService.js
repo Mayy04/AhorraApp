@@ -1,4 +1,4 @@
-import DatabaseService from '../database/databaseService';
+import DatabaseService from '../database/DatabaseService';
 
 export default class UsuarioService {
     constructor() {
