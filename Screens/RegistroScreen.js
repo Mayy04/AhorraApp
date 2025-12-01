@@ -1,44 +1,76 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView } from "react-native";
-import UsuarioService from "../services/usuarioService";
-
+import UsuarioService from "../Services/usuarioService";
 
 export default function RegistroScreen({ navigation, setUsuarioLogueado }) {
+  const [nombre, setNombre] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [confirmar, setConfirmar] = useState("");
+  const [cargando, setCargando] = useState(false);
 
-const[nombre,setNombre] = useState("");
-const[correo,setCorreo] = useState("");
-const[telefono,setTelefono] = useState("");
-const[contraseña,setContraseña] = useState("");
-const[confirmar,setConfirmar] = useState("");
-const[cargando,setCargando] = useState(false);
+  const usuarioService = new UsuarioService();
 
-const usuarioService = new UsuarioService();
+  const validarFormulario = () => {
+    const errores = [];
 
- const registrar = async() => {
-  if(contraseña !== confirmar){
-    Alert.alert("error","las contraseñas no coinciden");
-    return;
-  }
-  setCargando(true);
- const resultado = await usuarioService.crearUsuario(nombre, correo, telefono, contraseña);
-  setCargando (false);
-  if(resultado.error){
-    Alert.alert("Error", resultado.error);
-  }else {
+    if (!nombre || nombre.length < 3) {
+      errores.push("El nombre debe tener al menos 3 caracteres");
+    }
+
+    if (!correo || !usuarioService.validarCorreo(correo)) {
+      errores.push("Correo electrónico no válido");
+    }
+
+    if (!telefono || !usuarioService.validarTelefono(telefono)) {
+      errores.push("Teléfono debe tener mínimo 10 dígitos");
+    }
+
+    if (!contrasena || contrasena.length < 4) {
+      errores.push("Contraseña debe tener mínimo 4 caracteres");
+    }
+
+    if (contrasena !== confirmar) {
+      errores.push("Las contraseñas no coinciden");
+    }
+
+    return errores;
+  };
+
+  const registrar = async () => {
+    const errores = validarFormulario();
+    
+    if (errores.length > 0) {
+      Alert.alert("Error", errores.join("\n"));
+      return;
+    }
+
+    setCargando(true);
+    const resultado = await usuarioService.crearUsuario(nombre, correo, telefono, contrasena);
+    setCargando(false);
+
+    if (resultado.error) {
+      Alert.alert("Error", resultado.error);
+    } else {
       Alert.alert("Éxito", "¡Cuenta creada exitosamente!", [
         { 
           text: "OK", 
           onPress: () => navigation.navigate('InicioSesion') 
         }
       ]);
-
-      setNombre(""); setCorreo(""); setTelefono(""); setContraseña(""); setConfirmar("");
+      // Limpia los campos
+      setNombre("");
+      setCorreo("");
+      setTelefono("");
+      setContrasena("");
+      setConfirmar("");
     }
- };
+  };
 
- const irALogin =() =>{
-  navigation.navigate('InicioSesion');
- };
+  const irALogin = () => {
+    navigation.navigate('InicioSesion');
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -74,8 +106,8 @@ const usuarioService = new UsuarioService();
           style={styles.input} 
           placeholder="Contraseña" 
           secureTextEntry 
-          value={contraseña} 
-          onChangeText={setContraseña} 
+          value={contrasena} 
+          onChangeText={setContrasena} 
           placeholderTextColor="#999"
         />
         <TextInput 
@@ -86,7 +118,8 @@ const usuarioService = new UsuarioService();
           onChangeText={setConfirmar} 
           placeholderTextColor="#999"
         />
-         <TouchableOpacity 
+
+        <TouchableOpacity 
           style={[styles.boton, cargando && styles.botonDeshabilitado]} 
           onPress={registrar}
           disabled={cargando}
@@ -104,10 +137,10 @@ const usuarioService = new UsuarioService();
       </View>
     </ScrollView>
   );
-
 }
+
 const styles = StyleSheet.create({
-   scrollContainer: {
+  scrollContainer: {
     flexGrow: 1,
   },
   container: { 
@@ -123,7 +156,7 @@ const styles = StyleSheet.create({
     marginBottom: 10, 
     color: "#fff" 
   },
-   subtitulo: {
+  subtitulo: {
     fontSize: 16,
     color: "#fff",
     marginBottom: 30,
