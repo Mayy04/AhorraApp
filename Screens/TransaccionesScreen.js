@@ -5,7 +5,6 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import TransaccionService from "../Services/TransaccionService";
-import { useIsFocused } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get("window");
 
