@@ -10,18 +10,12 @@ export default function InicioSesionScreen({ navigation, setUsuarioLogueado }) {
 
   const usuarioService = new UsuarioService();
 
-
-
-
   const iniciarSesion = async () => {
     if (!correo || !contrasena) {
       Alert.alert('Error', 'Por favor completa todos los campos');
       return;
     }
     
-  const irARecuperar = () => {
-    navigation.navigate('RecuperarContraseña');
-  };
     setCargando(true);
     const resultado = await usuarioService.iniciarSesion(correo, contrasena);
     setCargando(false);
@@ -38,7 +32,7 @@ export default function InicioSesionScreen({ navigation, setUsuarioLogueado }) {
     navigation.navigate('Registro');
   };
 
-    const irARecuperar = () => {
+  const irARecuperar = () => {
     navigation.navigate('RecuperarContraseña');
   };
 
@@ -190,13 +184,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
   },
-
   botonSecundario:{
     alignSelf: 'flex-end',
     marginRight: '10%',       
     marginTop: 5,
     marginBottom: 10,
-
   },
   textoSecundario:{
     color: '#fff',

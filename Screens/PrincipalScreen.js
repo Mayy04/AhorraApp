@@ -3,7 +3,7 @@ import { View, Text, Image, ImageBackground, StyleSheet, Dimensions,
   TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
 import { useIsFocused } from '@react-navigation/native'; 
 import { Ionicons } from '@expo/vector-icons';
-import TransaccionService from '../services/TransaccionService';
+import TransaccionService from '../Services/TransaccionService';
 
 export default function PrincipalScreen({ navigation, route }) {
   const isFocused = useIsFocused();
@@ -28,8 +28,9 @@ export default function PrincipalScreen({ navigation, route }) {
     try {
       const [resumenData, recientesData] = await Promise.all([
         transaccionService.obtenerResumen(usuario.id),
-        transaccionService.obtenerTransaccionesRecientes(usuario.id, 3)
-      ]);   
+        transaccionService.obtenerTransaccionesRecientes(usuario.id, 3) 
+      ]);
+      
       setResumen(resumenData);
       setTransaccionesRecientes(recientesData);
     } catch (error) {
@@ -52,18 +53,6 @@ export default function PrincipalScreen({ navigation, route }) {
   const formatearFecha = (fecha) => {
     const [year, month, day] = fecha.split('-');
     return `${day}/${month}`;
-  };
-
-  const getIconoAccion = (accion) => {
-    const iconos = {
-      'ingreso': 'add-circle',
-      'egreso': 'remove-circle',
-      'analisis': 'stats-chart',
-      'presupuestos': 'calendar',
-      'metas': 'flag',
-      'perfil': 'person'
-    };
-    return iconos[accion] || 'cube';
   };
 
   const accionesRapidas = [
@@ -129,17 +118,17 @@ export default function PrincipalScreen({ navigation, route }) {
           <Text style={styles.saludo}>Hola, {usuario.nombre}</Text>
 
           <View style={styles.balanceCard}>
-            <Text style={styles.balanceTitle}>Saldo disponible</Text>
-            {cargando ? (
-              <Text style={styles.balanceAmountCargando}>Cargando...</Text>
-            ) : (
-              <Text style={[
-                styles.balanceAmount,
-                resumen?.saldoActual < 0 && styles.balanceNegativo
-              ]}>
-                {formatearMoneda(resumen?.saldoActual)}
-              </Text>
-            )}
+              <Text style={styles.balanceTitle}>Saldo disponible</Text>
+              {cargando ? (
+                  <Text style={styles.balanceAmountCargando}>Cargando...</Text>
+              ) : (
+                  <Text style={[
+                      styles.balanceAmount,
+                      resumen?.saldoActual < 0 && styles.balanceNegativo
+                  ]}>
+                      {formatearMoneda(resumen?.saldoActual)}
+                  </Text>
+              )}
           </View>
         </View>
 
@@ -161,6 +150,7 @@ export default function PrincipalScreen({ navigation, route }) {
             ))}
           </View>
         </View>
+
         {/* Resumen Financiero */}
         <View style={styles.seccion}>
           <Text style={styles.seccionTitulo}>Resumen del Mes</Text>
@@ -388,7 +378,6 @@ const styles = StyleSheet.create({
   resumenLabel: {
     fontSize: 12,
     color: '#666',
-    textAlign: 'center',
   },
   transaccionesLista: {
     marginTop: 10,
@@ -397,9 +386,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 8,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
   },
   transaccionInfo: {
     flexDirection: 'row',
@@ -408,16 +403,17 @@ const styles = StyleSheet.create({
   },
   transaccionDetalles: {
     marginLeft: 10,
+    flex: 1,
   },
   transaccionCategoria: {
     fontSize: 14,
     fontWeight: '600',
     color: '#333',
+    marginBottom: 2,
   },
   transaccionFecha: {
     fontSize: 12,
     color: '#666',
-    marginTop: 2,
   },
   transaccionMonto: {
     fontSize: 14,

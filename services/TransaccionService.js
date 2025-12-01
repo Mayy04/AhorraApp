@@ -45,6 +45,11 @@ export default class TransaccionService {
             if (resultado.error) {
                 return resultado;
             }
+
+            // Actualizar automáticamente los presupuestos cuando se genera un egreso
+            if (tipo === 'egreso') {
+                await this.actualizarPresupuestosPorEgreso(usuario_id, categoria, monto);
+            }
             
             return { 
                 ok: true, 
@@ -64,6 +69,35 @@ export default class TransaccionService {
         }
     }
 
+    // Actualizar presupuestos cuando se hace un egreso
+    async actualizarPresupuestosPorEgreso(usuario_id, categoria, monto) {
+        try {
+            console.log(`Actualizando presupuestos por egreso: ${categoria} - $${monto}`);
+            
+            const presupuestoService = new (await import('./presupuestoService')).default();
+            
+            // Forzar la actualización del progreso de los presupuestos
+            const resultado = await presupuestoService.actualizarProgresoPresupuestos(usuario_id);
+            
+            if (resultado.ok) {
+                console.log(`Presupuestos actualizados después del egreso en ${categoria}`);
+                const presupuestoAfectado = resultado.presupuestos.find(p => 
+                    p.categoria.toLowerCase() === categoria.toLowerCase()
+                );
+                
+                if (presupuestoAfectado) {
+                    console.log(`Presupuesto afectado: ${presupuestoAfectado.categoria} - Gastado: $${presupuestoAfectado.gastoActual} de $${presupuestoAfectado.monto}`);
+                } else {
+                    console.log(`No hay presupuesto configurado para la categoría: ${categoria}`);
+                }
+            } else {
+                console.log("Error actualizando presupuestos después del egreso");
+            }
+        } catch (error) {
+            console.log("Error actualizando presupuestos por egreso:", error);
+        }
+    }
+
     async obtenerTransacciones(usuario_id, filtro = 'todos') {
         console.log("Obteniendo transacciones para usuario:", usuario_id, "Filtro:", filtro);
         
@@ -71,10 +105,19 @@ export default class TransaccionService {
             const transacciones = await this.db.getTransaccionesPorUsuario(usuario_id, filtro);
             console.log(`Se encontraron ${transacciones.length} transacciones`);
             
+            // Asegurar que estén ordenadas correctamente
+            const transaccionesOrdenadas = transacciones.sort((a, b) => {
+                // Primero por fecha (más reciente primero)
+                const fechaCompare = new Date(b.fecha) - new Date(a.fecha);
+                if (fechaCompare !== 0) return fechaCompare;
+                // Si misma fecha, por ID (más reciente primero)
+                return b.id - a.id;
+            });
+            
             return { 
                 ok: true, 
-                transacciones,
-                total: transacciones.length
+                transacciones: transaccionesOrdenadas,
+                total: transaccionesOrdenadas.length
             };
         } catch (error) {
             console.log("Error obteniendo transacciones:", error);
@@ -189,86 +232,51 @@ export default class TransaccionService {
         console.log("Obteniendo transacciones recientes para usuario:", usuario_id);
         
         try {
-            const transacciones = await this.db.getAllAsync(`
-                SELECT * FROM transacciones 
-                WHERE usuario_id = ? 
-                ORDER BY fecha DESC, id DESC
-                LIMIT ?
-            `, [usuario_id, limite]);
-
+            const transacciones = await this.db.getTransaccionesRecientes(usuario_id, limite);
             console.log(`${transacciones.length} transacciones recientes obtenidas`);
             return transacciones;
-
         } catch (error) {
             console.log("Error obteniendo transacciones recientes:", error);
             return [];
         }
     }
 
-    async buscarTransacciones(usuario_id, criterio) {
-        console.log("Buscando transacciones para usuario:", usuario_id, "Criterio:", criterio);
+    async obtenerTransaccionesFiltradas(usuario_id, filtros = {}) {
+        console.log("Obteniendo transacciones filtradas:", { usuario_id, filtros });
         
-        if (!criterio || criterio.trim() === '') {
-            return await this.obtenerTransacciones(usuario_id);
-        }
-
         try {
-            const busqueda = `%${criterio}%`;
-            const transacciones = await this.db.getAllAsync(`
-                SELECT * FROM transacciones 
-                WHERE usuario_id = ? AND 
-                      (categoria LIKE ? OR descripcion LIKE ?)
-                ORDER BY fecha DESC
-            `, [usuario_id, busqueda, busqueda]);
-
-            console.log(`Se encontraron ${transacciones.length} transacciones con el criterio: ${criterio}`);
+            const transacciones = await this.db.getTransaccionesFiltradas(usuario_id, filtros);
+            console.log(`Se encontraron ${transacciones.length} transacciones con filtros`);
+            
+            // Ordenamiento
+            const transaccionesOrdenadas = transacciones.sort((a, b) => {
+                const fechaCompare = new Date(b.fecha) - new Date(a.fecha);
+                if (fechaCompare !== 0) return fechaCompare;
+                return b.id - a.id;
+            });
+            
             return { 
                 ok: true, 
-                transacciones,
-                total: transacciones.length,
-                criterio: criterio
+                transacciones: transaccionesOrdenadas,
+                total: transaccionesOrdenadas.length,
+                filtrosAplicados: filtros
             };
-
         } catch (error) {
-            console.log("Error buscando transacciones:", error);
+            console.log("Error obteniendo transacciones filtradas:", error);
             return { 
-                error: "Error al buscar transacciones",
+                error: "Error al cargar transacciones",
                 transacciones: [],
                 total: 0,
-                criterio: criterio
-            };
-        }
-    }
-        // Reemplazar la función obtenerResumen existente
-    async obtenerResumen(usuario_id) {
-        console.log("Obteniendo resumen COMPLETO para usuario:", usuario_id);
-        
-        try {
-            const resumen = await this.db.getResumenFinancieroCompleto(usuario_id);
-            console.log("Resumen completo obtenido:", resumen);
-            
-            return resumen;
-        } catch (error) {
-            console.log("Error obteniendo resumen completo:", error);
-            return { 
-                saldoActual: 0, 
-                ingresosMes: 0, 
-                gastosMes: 0, 
-                ahorroMes: 0,
-                totalAhorradoMetas: 0,
-                saldoDisponible: 0,
-                mesActual: new Date().toISOString().substring(0, 7),
-                error: "Error al cargar resumen"
+                filtrosAplicados: filtros
             };
         }
     }
 
-    // Nueva función para obtener categorías de transacciones
-    async obtenerCategoriasDeTransacciones(usuario_id) {
-        console.log("Obteniendo categorías de transacciones para usuario:", usuario_id);
+    async obtenerCategoriasUnicas(usuario_id) {
+        console.log("Obteniendo categorías únicas para usuario:", usuario_id);
         
         try {
-            const categorias = await this.db.getCategoriasDeTransacciones(usuario_id);
+            const categorias = await this.db.getCategoriasUnicas(usuario_id);
             console.log("Categorías obtenidas:", categorias);
             
             return categorias;
@@ -277,6 +285,4 @@ export default class TransaccionService {
             return [];
         }
     }
-
-    
 }
