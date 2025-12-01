@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {View, Text, TouchableOpacity, StyleSheet, FlatList, Image, ImageBackground, Dimensions, TextInput, Alert, Modal, ScrollView} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import TransaccionService from "../Services/TransaccionService";
+import TransaccionService from "../services/TransaccionService";
 
 const { width, height } = Dimensions.get("window");
 
