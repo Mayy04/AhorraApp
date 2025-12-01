@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView } from "react-native";
+import UsuarioService from "../services/usuarioService";
 
 
 export default function RegistroScreen({ navigation, setUsuarioLogueado }) {
@@ -19,7 +20,7 @@ const usuarioService = new UsuarioService();
     return;
   }
   setCargando(true);
-  const resultado = await usuarioService.crearUsuario(nombre.correo,telefono,contraseña);
+ const resultado = await usuarioService.crearUsuario(nombre, correo, telefono, contraseña);
   setCargando (false);
   if(resultado.error){
     Alert.alert("Error", resultado.error);
@@ -31,7 +32,7 @@ const usuarioService = new UsuarioService();
         }
       ]);
 
-      setNombre(""); setCorreo(""); setTelefono(""); setContrasena(""); setConfirmar("");
+      setNombre(""); setCorreo(""); setTelefono(""); setContraseña(""); setConfirmar("");
     }
  };
 
@@ -73,8 +74,8 @@ const usuarioService = new UsuarioService();
           style={styles.input} 
           placeholder="Contraseña" 
           secureTextEntry 
-          value={contrasena} 
-          onChangeText={setContrasena} 
+          value={contraseña} 
+          onChangeText={setContraseña} 
           placeholderTextColor="#999"
         />
         <TextInput 

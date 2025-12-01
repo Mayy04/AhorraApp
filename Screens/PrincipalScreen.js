@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, ImageBackground, StyleSheet, Dimensions, 
   TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
-import { useNavigation, useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native'; 
 import { Ionicons } from '@expo/vector-icons';
-import TransaccionService from '../Services/TransaccionService';
+import TransaccionService from '../services/TransaccionService';
 
-export default function PrincipalScreen({ navigation }) {
-  const navigation = useNavigation();
+export default function PrincipalScreen({ navigation, route }) {
   const isFocused = useIsFocused();
 
   const [resumen, setResumen] = useState(null);
@@ -14,7 +13,7 @@ export default function PrincipalScreen({ navigation }) {
   const [refrescando, setRefrescando] = useState(false);
   const [transaccionesRecientes, setTransaccionesRecientes] = useState([]);
 
-  const usuario = route.params?.usuario || { id: 1, nombre: 'Usuario' };
+  const usuario = route?.params?.usuario || { id: 1, nombre: 'Usuario' };
 
   const transaccionService = new TransaccionService();
 

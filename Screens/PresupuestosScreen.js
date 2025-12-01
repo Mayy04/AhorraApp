@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TransaccionService from '../services/TransaccionService';
-import styles from '../styles/presupuestos';
+import { styles } from "../styles";
 
 const { width, height } = Dimensions.get('window');
 
