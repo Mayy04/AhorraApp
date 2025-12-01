@@ -128,7 +128,6 @@ export default class DatabaseService {
         } catch (error) {
             console.log("Error eliminando transacción:", error);
             return { error: "Error al eliminar" };
-
         }
     }
 

@@ -1,3 +1,4 @@
+// services/MetaService.js
 import DatabaseService from '../database/databaseService';
 
 export default class MetaService {
@@ -173,7 +174,7 @@ export default class MetaService {
     }
 
     async eliminarMeta(id) {
-        console.log("Eliminando meta ID:", id);
+        console.log("🗑️ Eliminando meta ID:", id);
         
         if (!id) {
             return { error: "ID de meta requerido" };
@@ -270,63 +271,4 @@ export default class MetaService {
             console.log("Error migrando metas de ejemplo:", error);
         }
     }
-
-    // Modificar la función agregarAhorro existente
-    async agregarAhorro(id, monto, usuario_id) {
-        console.log("Agregando ahorro a meta ID:", id, "Monto:", monto, "Usuario:", usuario_id);
-        
-        if (!id || !monto || !usuario_id) {
-            return { error: "ID, monto y usuario_id son requeridos" };
-        }
-
-        const montoNum = parseFloat(monto);
-        if (isNaN(montoNum) || montoNum <= 0) {
-            return { error: "El monto debe ser un número válido mayor a 0" };
-        }
-
-        try {
-            // Obtener meta actual
-            const metas = await this.db.getMetasPorUsuario(usuario_id);
-            const meta = metas.find(m => m.id === id);
-            
-            if (!meta) {
-                return { error: "Meta no encontrada" };
-            }
-
-            const nuevoMonto = meta.monto_actual + montoNum;
-            
-            // 1. Actualizar monto en la meta
-            const resultado = await this.db.actualizarMontoMeta(id, nuevoMonto);
-            
-            if (resultado.error) {
-                return resultado;
-            }
-            
-            // 2. Crear transacción de ahorro (esto afecta el saldo disponible)
-            const fecha = new Date().toISOString().split('T')[0];
-            const transaccionResult = await this.db.insertTransaccionMeta(
-                usuario_id,
-                id,
-                montoNum,
-                fecha,
-                `Ahorro para meta: ${meta.nombre}`
-            );
-            
-            if (transaccionResult.error) {
-                console.log("Error creando transacción de ahorro:", transaccionResult.error);
-                // Continuamos aunque falle la transacción, pero el ahorro se registró
-            }
-            
-            return { 
-                ok: true, 
-                mensaje: `Se agregaron $${montoNum} a la meta`,
-                nuevoMonto: nuevoMonto,
-                metaActualizada: { ...meta, monto_actual: nuevoMonto }
-            };
-        } catch (error) {
-            console.log("Error agregando ahorro:", error);
-            return { error: "Error al agregar ahorro" };
-        }
-    }
-
 }
