@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-    View, Text, TouchableOpacity, StyleSheet, FlatList, Image, 
-    ImageBackground, Dimensions, TextInput, Alert, Modal, ScrollView
-} from "react-native";
+import {View, Text, TouchableOpacity, StyleSheet, FlatList, Image,ImageBackground, Dimensions, TextInput, Alert, Modal, ScrollView} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import TransaccionService from "../Services/TransaccionService";
+import { useIsFocused } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get("window");
 

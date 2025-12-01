@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {View, Text, TextInput, TouchableOpacity, Image, Alert, StyleSheet, ScrollView} from 'react-native';
-import UsuarioService from '../services/usuarioService';
+import UsuarioService from '../Services/usuarioService';
 
 export default function InicioSesionScreen({ navigation, setUsuarioLogueado }) {
   const [correo, setCorreo] = useState('');
